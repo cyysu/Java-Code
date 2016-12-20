@@ -1,0 +1,404 @@
+
+    CSS 把Html的显示部分抽离出来，一次定义多个页面的显示效果
+     在<head>里定义：
+       <link rel="stylesheet" href="test1.css" type="text/css" /> <!-- 导入CSS文件 -->
+       <style>                        {<!-- 这里用Html注释会影响其他的内容，需要括起来 -->}
+           h1{color:red;font-size:45} /* 定义h1的标题是红的，并改变字体大小 */
+           h2,h3,h4{color:blue}       /* 连续定义h2,h3,h4的标题颜色的 */
+           h1.class1{color:yellow}    /* 带class1的h1是黄的，其他h1不变 */
+           .class2{font-family:宋体}   /* 定义所有带".class2"的标题都是宋体字的，级别较单独h的高 */
+           #c1{color:#F304DE}         /* 定义带id的为紫色；不常用，因为id经常有表格的用途 */
+           body{font-size:20pt}       /* 定义整个body的内容显示格式 */
+           DIV{text-align:center;}    /* 可定义所有与样式有关的东西 */
+       </style>
+    作用范围：范围越广，优先级越低。
+    注释：可用Html的注释，但为避免微量的影响，建议括起来。还可用 /*...*/ 注释；但不能用双斜杆注释 //...
+    另外写的CSS文件，只需写<style>里面的内容
+
+
+Java Script 基础 (1天) 
+一、 JS的简介
+     JavaScript是一种网页编程技术，经常用于创建动态交互网页
+     JavaScript是一种基于对象和事件驱动的解释性脚本语言，类似C语言和Java的语法
+     事先不编译；逐行执行；无需进行严格的变量声明；内置大量现成对象，编写少量程序可以完成目标
+     不同的浏览器甚至同一浏览器的不同版本对JavaScript的支持程度都不一样
+二、 JS的基本语法
+    0. 有两种JavaScript写法：
+       a. 直接在 html 中嵌入：程序写在 <script>...</script>内。
+       b. 调用独立JavaScript文件：在html中写<script src="test1.js"></script>； script不能用空标志。
+         JS脚本文件中不需要脚本开始和结束声明，直接写 function 
+    1. 在HTML中大小写是不敏感的，但标准的JavaScript是区分大小写的
+    2. 分号表示语句结束。有换行，分号允许不加(建议加上，以免错误和歧义) 
+       程序忽略缩进：提倡加上空格或TAB增强程序可读性
+    3. 标识符：成份是 不以数字开头的字母、数字 和下划线(_)、美元符($) 
+       ECMA v3标准保留的JavaScript的关键字：
+        break  case      catch  continue  default     delete  do     else    false   finally
+        for    function  if     in        instanceof  new     null   return  switch  this
+        throw  true      try    typeof    var         void    while  with
+    4. 变量的声明： var x,y; (变量没类型；未声明的变量也可以用，且是全局的；函数体内声明的变量则是局部的) 
+                x=1; y="hello world!";  (变量的类型由所赋的值决定) 
+    5. 函数： function 函数名 (参数){ 函数体; return 返回值;} 
+       参数没类型或顺序，且可变长；可以使用变量、常量或表达式作为函数调用的参数
+       函数由关键字 function 定义； 函数名的定义规则与标识符一致，大小写是敏感的
+       返回任意类型(不需写返回类型)； 返回值必须使用return 
+
+    6. 数据类型： 
+       基本类型: Number：数字、 String：字符串、 Boolean：布尔
+       特殊类型: Null：空、     Undefined：未定义
+       组合类型: Array：数组、  Object：对象
+    7. Number 数值类型：所有数字都采用64位浮点格式存储，相当于Java和C语言中的double格式
+       能表示的最大值是 ±1.7976931348623157 x 10^308；能表示的最小值是 ±5 x 10^ -324
+       10进制的整数的精确表达的范围是 -9007199254740992 (-2^53) 到 9007199254740992 (2^53) 
+       16进制数据前面加上0x，八进制前面加0
+    8. String 类型：字符串常量首尾由单引号或双引号括起
+       没有字符，只有字符串(所有字符都按字符串处理) 
+       常用转义符： \n换行   \'单引号    \“双引号   \\右斜杆  (字符串中部分特殊字符必须加上右划线\) 
+       汉字常使用特殊字符写，如： \u4f60 -->"你"  \u597d -->"好" (可避免乱码) 
+    9. Boolean 类型：仅有两个值：true和false，实际运算中true=1,false=0
+       也可以看作on/off、yes/no、1/0对应true/false；主要用于JavaScript的控制语句
+    10.Null、Undefine 类型：
+       Null在程序中代表变量没有值；或者不是一个对象
+       Undefined代表变量的值尚未指定；或者对象属性根本不存在
+       有趣的比较：
+          null与空字符串:   不相等，null代表什么也没有，空字符串则代表一个为空的字符串
+          null与false :    不相等，但是!null等于true
+          null与0     :    不相等，(但是在C++等其他语言中是相等的) 
+          null与undefined: 相等，但是null与undefined并不相同
+    11.数据类型转换：JavaScript属于松散类型的程序语言
+       变量在声明的时候并不需要指定数据类型；变量只有在赋值的时候才会确定数据类型
+       表达式中包含不同类型数据则在计算过程中会强制进行类别转换(优先级：布尔-->数字-->字符) 
+         数字 + 字符串：数字转换为字符串
+         数字 + 布尔值：true转换为1，false转换为0
+         字符串 + 布尔值：布尔值转换为字符串true或false
+       函数parseInt：强制转换成整数(如果包含字符串，则转换到字符串为止，后面不再理) //如 parseInt("13a2")=13
+       函数parseFloat： 强制转换成浮点数
+       函数eval：将字符串强制转换为表达式并返回结果
+       函数typeof：查询数据当前类型(string / number / boolean / object ) 
+    12.运算符：(同java) 
+       算术运算符: 加/字符连接(+)、 减/负号(－)、 乘(*) 、除(/)、 余数(% )； 递增(++)、 递减(--) 
+       逻辑运算符: 等于( == )、 不等于( != ) 、 大于( > ) 、 小于( < ) ； 大于等于(>=) 、小于等于(<=) 
+               与(&&) 、或(||) 、非(!) ；  恒等(===)、不恒等(!==) 
+       位运算符:   左移(<<) 、有符号右移(>>)；无符号右移(>>>) 
+               位与(&) 、位或(|)、异或(^) 、NOT (~) 
+       赋值运算符: 赋值(=) 、复合赋值(oP=  如：+=  &=) 
+    13.选择控制语句(同java)
+       if(...){...} else{...}   if 语句允许不使用else子句；允许进行嵌套
+       switch(表达式){case 值1:语句1;break;  case 值2:语句2;break;  default:语句3;}
+    14.循环控制语句(大体同java) 
+       for (初始化;条件;增量){ 语句1; ... } 
+        for-each遍历：for(var 下标 in 数组){ 语句; } //java用":"代替"in"
+       while (条件){ 语句1; ... } 
+
+    15.对象：JavaScript是一种基于对象语言，对象是JavaScript中最重要的元素
+       对象由属性和方法封装而成
+       avaScript包含四种对象:
+          内置对象 DATE
+          自定义对象 Cart
+          浏览器对象 WIndow
+          ActiveX对象 ActionXObject
+
+三、 JS的内置对象
+    11种内置对象：Array, Boolean, Date, Math, Number , String
+              Error, Function, Global , Object, RegExp
+       在JavaScript中除了null和undefined以外其他的数据类型都被定义成了对象
+       可以用创建对象的方法定义变量；  String、Math、Array、Date、RegExp是JavaScript中常用的对象
+    内置对象的分类：
+       数据对象: Number数据对象； String字符串对象； Boolean布尔值对象
+       组合对象: Array数组对象；  Math数学对象； Date日期对象
+       高级对象: Object自定义对象；Error错误对象；Function函数对象； RegExp正则表达式对象；Global全局对象
+    自动创建对象:调用字符串的对象属性或方法时自动创建对象，用完就丢弃。 如： var str1="hello world";
+    手工创建对象:采用new创建字符串对象str1，全局有效。 如：var str1= new String("hello word");
+
+    1. String 字符串对象：
+       格式编排:anchor()锚、blink()闪烁、fixed()固定、bold()粗体、italics()斜体、strike()删除线
+               big()字变大、small()字变小、sub()下标、sup()上标；
+               fontcolor(color)字体颜色、fontsize(size)字体大小、link(url)超链接
+       大小写转换:  toLowerCase()返回小写字符串、toUpperCase()返回大写字符串
+       获取指定字符:charAt(index)返回指定位置字符、charCodeAt(index)返回指定位置字符Unicode编码
+           用法：str1.bold();//字体变粗；相当于“<b>str1</b>“   str1.anchor(); //把str1标识为锚 
+       子字符串处理:
+           截取:str1.substr(start,length);  //返回从索引位置start开始长为length的子字符串
+               str1.substring(start,end);  //返回start开始end结束的子字符串,不包括最后的一个
+               str1.slice(start,end);      //同substring，但允许使用负数表示从后计算位置,不包括最后的一个
+           替换:str1.replace(findstr,tostr); //返回替换finstr为tostr之后的字符串
+           分割:str1.split(bystr);     //返回由bystr分割成的字符串数组(通常bystr是连接符号，如逗号或横杆) 
+           连接:str1.concat(string2);      //返回 str1 与 string2 连接后的字符串
+       查询字符串: indexOf(findstr,index)返回正向的索引位置、lastIndexOf(findstr)返回反向的索引位置
+                 match(regexp)返回匹配的字符串、search(regexp)返回找到字符串的首字符索引 
+       用法：
+         str1.indexOf(findstr,index);//查找字符串findstr;从index位置开始的索引，省略index则从0开始找;↓
+         str1.lastIndexOf(findstr);  //从后面找起;返回findstr在str1中出现的首字符位置下标，没有找到返回-1
+         str1.match(regexp);   //regexp代表正则表达式或字符串;返回匹配字符串的数组，如果没有匹配则返回null
+         str1.search(regexp);  //返回匹配字符串的首字符位置下标;作用同indexOf方法,但可写正则表达式
+         str1.length;          //获取字符串长度；汉字、字母长度均为1；返回大于或等于0的整数
+    2. Array 数组对象：
+         x.length;             //获取数组元素的个数；返回大于或等于0的整数
+       连接数组： (原数组不变) 
+         x.join(bystr);        //把数组的各元素由bystr连接起来作为字符串；与字符串的split功能刚好相反
+         x.toString();         //返回由逗号(,)连接数组元素组成的字符串
+           document.write(v.toString());document.write(v);  //这两句效果一样
+         v = x.concat(元素, ...);  //把元素添加到数组尾端后，返回另一数组
+       数组排序： (返回排序后的数组；改变原数组) 
+         x.reverse();          //按原顺序倒着排序
+         x.sort();             //按字典顺序排序
+       获取子数组： (返回被删/被截取的元素数组) 
+         x.slice(start,end);   //从start下标开始，截取到end；返回被截取的元素数组；不改变原数组
+           //start和end可用负数表倒数(-1代表最后一个元素)；end<start时不截取；忽略end，截取start后的所有元素
+         x.splice(start,n,value, ...);  //从start下标开始删除n个，再插入value(可理解为替换)；改变原数组
+           //start为负数时表倒数；n<1表不删除；可忽略value(不插入)；可忽略n，表删除后面所有；返回被删元素数组
+    3. 栈：(数组的基础； 改变原数组) 
+       v.pop(); //删最后的一个元素；返回删除的元素
+       v.push(元素, ...);       //添加元素到最后位置；返回数组长度 
+       v.unshift(元素, ...);    //添加元素到最前位置(多个参数，则按参数顺序同时插入)；返回数组长度 
+       v.shift();  //删最前的一个元素；返回被删除的元素
+    4. Math 数学对象：
+       都是数学常数：(可直接用) 
+       Math.E (自然数)        Math.LN2 (ln2)     Math.LN10 (ln10)         Math.LOG2E (log 2e)
+       Math.LOG10E (log e)   Math.PI (圆周率)    Math.SQRT1_2 (根号1/2)    Math.SQRT2 (根号2)
+       三角函数：
+          Math.sin(x)        计算正弦值； (x在0~2π之间，返回值-1~1) 
+          Math.cos(x)        计算余弦值； (x在0~2π之间，返回值-1~1) 
+          Math.tan(x)        计算正切值； (x在0~2π之间，返回正切值) 
+       反三角函数：
+          Math.asin(x)       计算反正弦值；(x在 -1与1之间，返回0~2π) 
+          Math.acos(x)       计算反余弦值；(x在 -1与1之间，返回0~2π) 
+          Math.atan(x)       计算反正切值；(x可以为任意值，返回 -π/2 ~π/2) 
+          Math.atan2(y,x)    计算从X轴到一个点的角度；(y,x分别为点的纵坐标和横坐标，返回-π ~π) 
+       计算函数：
+          Math.sqrt(x)       计算平方根 
+          Math.pow(x,y)           计算x^y
+          Math.exp(x)        计算e的指数 e^x
+          Math.log(x)        计算自然对数 (x为大于0的整数) 
+       数值比较函数：
+          Math.abs(x)        计算绝对值
+          Math.max(x,y,...)  返回参数中最大的一个
+          Math.min(x,y,...)  返回参数中最小的一个
+        * Math.random( )     计算0~1之间的一个随机数
+          Math.round(x)      舍入为最接近的整数(四舍五入，负数时五舍六入) 
+        * Math.floor(x)      对一个数下舍入 (结果不大于x；正数时直接舍去小数，负数时 -1.1==-2 ) 
+          Math.ceil(x)       对一个数上舍入 (结果大于x) 
+    5. Date 时间对象：
+       创建日期对象：
+         a.不指定参数时：  var nowd1=new Date();document.write(nowd1.toLocaleString( ));
+           //显示当前时间，如：2008年11月24日 星期一 19时23分21秒 
+           //不用"toLocaleString()"则显示： Mon Nov 24 2008 19:23:21 GMT+0800 (CST)
+         b.参数为日期字符串： var nowd2=new Date("2008/3/20 11:12");alert(nowd2.toLocaleString());
+           //显示： 2008年03月20日 星期六 11时12分00秒
+           var nowd3=new Date("08/03/20 11:12");alert(nowd3.toLocaleString( ));
+           //显示： 1920年08月03日 星期六 11时12分00秒    //按 月、日、年 的顺序
+         c.参数为毫秒数：  var nowd3=new Date(5000); alert(nowd3.toLocaleString( ));
+           //显示： 1970年01月01日 星期四 08时00分05秒 //显示本国的时间 
+           alert(nowd3.toUTCString()); //显示西方的时间： Thu, 01 Jan 1970 00:00:05 GMT  
+         d.参数为年月日小时分钟秒毫秒： var nowd4=new Date(2008,10,24,11,12,0,300);
+           alert(nowd4.toLocaleString( )); //毫秒并不直接显示；月份参数从0~11，所以这里10对应11月份
+           //显示： 2008年11月24日 星期一 11时12分00秒
+       获取和设置日期、时间的方法：
+           getDate()          setDate(day_of_month)       日期 (1~31) 
+           getDay()                                       星期 (1~7;  没set方法) 
+           getMonth()         setMonth (month)            月份 (0~11; 别忘加1) 
+           getFullYear()      setFullYear (year)          完整年份(-271820~275760) 
+           getYear()          setYear(year)               年 (范围同上； 1900年计算为0) 
+           getHours()         setHours (hour)             小时 (0~23) 
+           getMinutes()       setMinutes (minute)         分钟 (0~59) 
+           getSeconds()       setSeconds (second)         秒 (0~59) 
+           getMilliseconds()  setMillliseconds (ms)       毫秒(0-999) 
+           getTime()          setTime (allms)             累计毫秒数(从1970/1/1 00:00:00开始) 
+           注意：set方法对任意整数有效，影响上一级的数；如setDate(-1)设为上个月30号。 但对小数没效。
+       日期和时间的转换：
+           getTimezoneOffset()  返回本地时间与GMT的时间差，以分钟为单位(中国为-480；差8小时) 
+           toUTCString()        返回国际标准时间字符串(默认) 
+           toLocalString()      返回本地格式时间字符串
+           Date.parse(x)        返回累计毫秒数(从1970/1/1 00:00:00到x的本地时间，忽略秒以下的数字) 
+           Date.UTC(x)          返回累计毫秒数(从1970/1/1 00:00:00到x的UTC时间) 不明UTC是什么
+
+
+JavaScript技术 (1天) 
+一、 JS使用DHtml/Dom元素
+    DHTML
+       定义：使用JavaScript和CSS级联样式表操作HTML创造出各种动态视觉效果统称为DHTML
+       DHTML = CSS + Html + JS
+       是一种浏览器端的动态网页技术
+    DHTML对象模型(DOM) 
+       将HTML标记、属性和CSS样式都对象化
+       可以动态存取HTML文档中的所有元素
+       可以使用属性name或id来存取或标记对象
+       改变元素内容或样式后浏览器中显示效果即时更新
+       DHTML对象模型包括浏览器对象模型和Document对象模型
+
+    Window对象的常用属性：
+     * document    对象，代表窗口中显示的HTML文档
+       frames      窗口中框架对象的数组
+     * history     对象，代表浏览过窗口的历史记录
+     * location    对象，代表窗口文件地址，修改属性可以调入新的网页
+     * status      (defaultStatus)窗口的状态栏信息
+       closed      窗口是否关闭，关闭时该值为true
+     * name        窗口名称，用于标识该窗口对象
+       opener      对象，是指打开当前窗口的window对象，如果当前窗口被用户打开，则它的值为null
+       parent      对象，当前窗口是框架页时指的是包含该框架页的上一级框架窗口
+       top         对象，当前窗口是框架页时指的是包含该框架页的最外部的框架窗口
+       self        对象，指当前Window对象
+       window      对象，指当前Window对象，同self
+    Window对象的常用方法：
+    (使用这些方法时，通常不加window也没区别；但在特定情况下必须加，如在内嵌页面用open();) 
+     * alert(),confirm(),prompt();       弹出简单对话框
+     * close(),open();                   关闭、打开窗口
+       print();                          打印窗口中网页的内容
+       focus(),blur();                   请求或放弃窗口为当前操作窗口
+       moveBy(),moveTo();                移动窗口
+       resizeBy(),resizeTo();            调整窗口大小
+       scrollBy(),scrollTo();            滚动窗口中网页的内容
+     * setInterval(),clearInterval();    设置或取消周期执行的定时器
+     * setTimeout(),clearTimeout();      设置或取消一次性执行的定时器
+    window主要功能：
+       1.窗口的打开和关闭
+         window.open(url,name,config) 打开新窗口；url:打开的超链接，name:窗口的名称，返回新窗口对象
+            config为窗口的配置参数：menubar 菜单条、toolbar 工具条、location 地址栏、directories 链接、
+            status 状态栏、scrollbars 滚动条、resizeable 可调整大小(以上参数值为yes或no，默认yes)；
+            width 窗口宽，以像素为单位；height 窗口高，以像素为单位(参数值为数值) 
+         window.close() 关闭窗口
+       2.对话框
+         简单对话框：
+            alert(str)  提示框，显示str字符串的内容；按[确定]关闭对话框
+            confirm(str) 确认对话框，显示str字符串的内容；按[确定]按钮返回true，[取消]返回false
+            prompt(str,value) 输入对话框，采用文本框输入信息；按[确定]按钮返回输入值，[取消]关闭
+         窗口对话框：
+            showModalDialog(url,arguments,config) IE4或更高版本支持该方法
+            showModelessDialog(url,arguments,config) IE5或更高版本支持该方法
+            参数:url 打开链接，arguments 传入参数名，config 窗口配置参数
+             config 外观配置参数：status、resizable、help 是否显示标题栏中的问号按钮、center 是否在桌面中间
+             dialogWidth 对话框宽、dialogHeight 对话框高、(上一行参数值为yes或no，这两行参数为多少像素)
+             dialogTop 对话框左上角的y坐标、dialogLeft 对话框左上角的x坐标
+       3.状态栏
+         window.status                 状态栏中的字符串信息允许进行设置或读取
+       4.定时器
+         tID1=setInterval(exp,time)    周期性执行代码exp；exp 代码块名，time 周期(毫秒)，返回启动的定时器
+         clearInterval(tID1)           停止周期性的定时器
+         tID2=setTimeout(exp,time)     一次性触发执行代码exp；返回已经启动的定时器
+         clearTimeout(tID2)            停止一次性触发的定时器
+       5.内容滚动
+         window.scroll(x,y)            滚动窗口到指定位置；单位为像素
+         window.scrollTo(x,y)          同scroll方法
+         window.scrollBy(ax,ay)        从当前位置开始，向右滚动ax像素，向下滚动ay像素
+       6.调整窗口大小和位置
+         window.moveTo(x,y)            移动窗口到指定位置；单位为像素
+         window.moveBy(ax,ay)          向右移动ax像素，向下移动ay像素，参数为负数表示反方向移动
+         window.resizeTo(width,height) 调整窗口大小为指定大小
+         window.resizeBy(ax,ay)        放大或缩小窗口；参数为负数表示缩小
+       7.Screen对象                     屏幕信息(属于window的子对象；常用于获取屏幕的分辨率和色彩) 
+         screen.width                  屏幕分辨率的宽度，例如1024*768分辨率下宽度为1024
+         screen.height                 类似上面，屏幕分辨率的高度
+         screen.availWidth             屏幕中可用的宽
+         screen.availHeight            屏幕中可用的高
+         screen.colorDepth             屏幕的色彩数
+       8.History对象                    窗口的访问历史信息(属于window的子对象,常用于返回到已经访问过的页面)
+         history.length                历史记录数
+         history.back()                返回上一页
+         
+       9.Navigator对象     浏览器和OS(系统)的信息 数组
+       10.Location对象      浏览器地址栏的信息
+    应用例子：窗口最大化
+       window.moveTo(0,0); window.resizeTo(screen.availWidth,screen.availHeight);
+       //采用screen对象的分辨率属性和resizeTo方法来动态确定窗口最大长度和宽度
+    
+二、 JavaScript编写客户端脚本程序的技能
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+动态 HTML(DHTML) 对象模型定义的事件：
+
+onabort             当用户中断下载图像时触发。
+onactivate          当对象设置为活动元素时触发。
+onafterprint        对象所关联的文档打印或打印预览后立即在对象上触发。
+onafterupdate       当成功更新数据源对象中的关联对象后在数据绑定对象上触发。
+onbeforeactivate    对象要被设置为当前元素前立即触发。
+onbeforecopy        当选中区复制到系统剪贴板之前在源对象触发。
+onbeforecut         当选中区从文档中删除之前在源对象触发。
+onbeforedeactivate  在 activeElement 从当前对象变为父文档其它对象之前立即触发。
+onbeforeeditfocus   在包含于可编辑元素内的对象进入用户界面激活状态前或可编辑容器变成控件选中区前触发。
+onbeforepaste       在选中区从系统剪贴板粘贴到文档前在目标对象上触发。
+onbeforeprint       对象的关联文档打印或打印预览前在对象上触发。
+onbeforeunload      在页面将要被卸载前触发。
+onbeforeupdate      当成功更新数据源对象中的关联对象前在数据绑定对象上触发。
+onblur              在对象失去输入焦点时触发。
+onbounce            当 marquee 对象的 behavior 属性设置为“alternate”且字幕的内容到达窗口一边时触发。
+oncellchange        在数据供应者中的数据变更时触发。
+onchange            当对象或选中区的内容改变时触发。
+onclick             在用户用鼠标左键单击对象时触发。
+oncontextmenu       在用户使用鼠标右键单击客户区打开上下文菜单时触发。
+oncontrolselect     当用户将要对该对象制作一个控件选中区时触发。
+oncopy              当用户复制对象或选中区，将其添加到系统剪贴板上时在源元素上触发。
+oncut               当对象或选中区从文档中删除并添加到系统剪贴板上时在源元素上触发。
+ondataavailable     每当异步传输数据的数据源对象的数据到达时触发。
+ondatasetchanged    当数据源对象对应的数据集发生变更时触发。
+ondatasetcomplete   触发就表明数据源对象所有数据都可用。
+ondblclick          当用户双击对象时触发。
+ondeactivate        当 activeElement 从当前对象变为父文档其它对象时触发。
+ondrag              当进行拖曳操作时在源对象上持续触发。
+ondragend           当用户在拖曳操作结束后释放鼠标时在源对象上触发。
+ondragenter         当用户拖曳对象到一个合法拖曳目标时在目标元素上触发。
+ondragleave         当用户在拖曳操作过程中将鼠标移出合法拖曳目标时在目标对象上触发。
+ondragover          当用户拖曳对象划过合法拖曳目标时持续在目标元素上触发。
+ondragstart         当用户开始拖曳文本选中区或选中对象时在源对象上触发。
+ondrop              当鼠标按钮在拖曳操作过程中释放时在目标对象上触发。
+onerror             当对象装载过程中发生错误时触发。
+onerrorupdate       更新数据源对象中的关联数据出错时在数据绑定对象上触发。
+onfilterchange      当可视滤镜更改状态或完成转换时触发。
+onfinish            当字幕循环完成后触发。
+onfocus             当对象获得焦点时触发。
+onfocusin           当元素将要被设置为焦点之前触发。
+onfocusout          在移动焦点到其它元素之后立即触发于当前拥有焦点的元素上触发。
+onhelp              当用户在浏览器为当前窗口时按 F1 键时触发。
+onkeydown           当用户按下键盘按键时触发。
+onkeypress          当用户按下字面键时触发。
+onkeyup             当用户释放键盘按键时触发。
+onlayoutcomplete    当打印或打印预览版面处理完成用来自于源文档的内容填充当前 LayoutRect 对象时触发。
+onload              在浏览器完成对象的装载后立即触发。
+onlosecapture       当对象失去鼠标捕捉时触发。
+onmousedown         当用户用任何鼠标按钮单击对象时触发。
+onmouseenter        当用户将鼠标指针移动到对象内时触发。
+onmouseleave        当用户将鼠标指针移出对象边界时触发。
+onmousemove         当用户将鼠标划过对象时触发。
+onmouseout          当用户将鼠标指针移出对象边界时触发。
+onmouseover         当用户将鼠标指针移动到对象内时触发。
+onmouseup           当用户在鼠标位于对象之上时释放鼠标按钮时触发。
+onmousewheel        当鼠标滚轮按钮旋转时触发。
+onmove              当对象移动时触发。
+onmoveend           当对象停止移动时触发。
+onmovestart         当对象开始移动时触发。
+onpaste             当用户粘贴数据以便从系统剪贴板向文档传送数据时在目标对象上触发。
+onpropertychange    当在对象上发生对象上发生属性更改时触发。
+onreadystatechange  当对象状态变更时触发。
+onreset             当用户重置表单时触发。
+onresize            当对象的大小将要改变时触发。
+onresizeend         当用户更改完控件选中区中对象的尺寸时触发。
+onresizestart       当用户开始更改控件选中区中对象的尺寸时触发。
+onrowenter          触发就表明当前行已经在数据源中更改，对象上有可用的新数据值。
+onrowexit           当数据源控件更改对象当前行前触发。
+onrowsdelete        当行将要从记录集中被删除时触发。
+onrowsinserted      当在当前记录集中插入新行后触发。
+onscroll            当用户滚动对象的滚动条时触发。
+onselect            当当前选中区改变时触发。
+onselectionchange   当文档的选中状态改变时触发。
+onselectstart       对象将要被选中时触发。
+onstart             在 marquee 对象的每次循环开始时触发。
+onstop              当用户单击停止按钮或离开 Web 页面时触发。
+onsubmit            当表单将要被提交时触发。
+onunload            在对象卸载前立即触发。
+
+
+

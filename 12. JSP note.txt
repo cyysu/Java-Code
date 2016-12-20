@@ -1,0 +1,1187 @@
+
+day1
+JSP 定义：
+    1)Java Server Page, Java EE 组件，本质上是 Servlet。
+    2)运行在 Web Container.接收 Http Request,生成 Http Response(默认协议是 Http 请求和响应) 
+    3)JSP 使得我们能够分离页面的静态 HTML 和动态部分——我们需要的技术。
+    4)使页面可以混和html代码、Java代码以及JSP标签；允许访问组件
+
+Servlet的缺陷(JSP出现的原因)：
+    1)写静态页面必须部署后才能看到效果，很难控制页面的外观。
+    2)从技术角度来说Servlet是Java代码和HTML静态代码的混合代码。
+    3)从市场竞争角度来说，微软推出了ASP产品。
+
+JSP的改进：
+    1)JSP是标签式的文本文件(区Servlet是Java文件) 
+    2)JSP不需要编译(其实是由服务器监测JSP文件的变化，再将其翻译成 Servlet 代码) 
+      服务器对其进行编译并在第一次请求时创建一个Servlet实例。所以，第一次访问JSP页面时会后延迟
+    3)JSP不用写配置文件
+    4)JSP以静态代码为主，Java代码为辅。Servlet反之。
+    5)是J2EE蓝图的一部分(Servlet、JSP以及EJB是J2EE的三大组件) 
+    JSP从本质上来说内核还是Servlet，但与Servlet不是替代关系而是一种互补的关系。
+    JSP适合于写显示层的动态页面，而Servlet则适合写控制层的业务控制(页面转发)。
+    JSP往纯标签方向发展，Servlet往纯代码方向发展，他们以Servlet内核(请求响应式的工作方式)往两个方向发展。
+
+
+基本语法
+一、JSP的声明(statement) 
+   用来定义在产生的类文件中的类的属性和方法(成员变量)。可声明类(即是内部类)。
+   由于servlet是工作在多线程环境下，所以尽量不要在service方法体外声明成员变量。
+   <%!.....%>  //声明时要加"!"，属于类成员，最先加载，可写于任何位置；不加则是脚本的局部变量，必须调用前写。
+   如：  <%!String hello="Hello, World!";%>  //变量的声明
+        <%=hello%>   //变量的调用
+        <%! private int counter=0;  public int count(){ return ++counter;} %> //函数的声明
+        <h1><%=count()%></h1> //函数的调用
+   声明规则：
+    1) JSP中声明的变量和方法对应于Servlet中的实例方法和实例变量。这些将被同时请求该页面的所有用户所共享;
+    2) 在使用变量或方法前须先定义(不是说声明变量的位置在页面中要处于使用变量的前面，而是指变量不声明不能使用);
+    3) 声明的变量或方法的作用域为当前页面或包含的页面;
+    4) 语句间以分号分隔。
+
+二、JSP代码段(Scriptlet) 
+      <% java代码 %> 
+   是一段可以在处理请求时间执行的Java代码。可以产生输出，也可以是一些流程控制语句。
+   在代码段中定义的变量为service方法中的局部变量。
+   1._jspService()中的局部代码：
+      <%  System.out.println("Hi,I like JSP."); %>   //在控制台打印出，网页上没显示
+      <%  out.println("Hi,I like JSP."); %>          //打印在网页上
+      <%  Connection conn=DriverManager.getConnection();  Statement st=conn.createStatement();
+        String sql="select * from users";               ResultSet rs=st.executeQuery(sql);
+         //……
+       %>
+    问：能否在JSP脚本里定义方法？
+    答：不能！ //脚本相当于方法，不能在方法里定义方法
+       <%!public void helloworld(){}%>  //可以声明方法
+       <% public void helloworld(){}%>  //编译出错；脚本不能定义方法
+   2.比较:
+        <%! int i=100;%>     //成员变量
+        <%  int i=101;%>     //_jspService()方法中的局部变量
+        <%=i%>  //同一文件里，局部变量优先
+   3.脚本小程序规则：
+     1) 你使用的脚本语言决定了脚本小程序的规则;
+     2) 语句间以分号分隔;
+     3) 可以使用默认的对象、import进的类、declaration声明的方法和对象以及useBean tag中声明的对象。
+
+三、JSP表达式(expression) 
+       <%=……%>   // "="号
+   在JSP请求处理阶段计算他的值，表达式生成的代码是Service方法中的一个代码片断。
+   JSP对于声明的处理：1、计算表达式的值
+                   2、将值转换成String
+                   3、用out.println发送标签；把数据输出至页面的当前位置
+      <%="Hello,JSP world!"%>     //out.println("Hello,JSP world");
+      <%=name%>                   //<%!String name="GiGi";%> out.println(name);
+      <%=new java.util.Date()%>   //out.println(new java.util.Date());
+   表达式规则： 
+     1) 你使用的脚本语言决定了脚本小程序的规则;
+     2) 执行的顺序为从左到右;
+     3) 分号不能用于表达式。
+
+四、JSP指令(direction) 
+   指令用于从JSP发送信息到容器上。用来设置全局变量，声明类，要实现的方法和输出内容等。
+   指令在JSP整个文件内有效。它为翻译阶段提供了全局信息。
+       <%@......%>  // "@"符号
+   指令包括：page、include、taglib
+   1.page指令
+        import、session、errorPage、isThreadSafe
+     页面的语言、内容类型、字符集、页面编码
+        <%@page language="java" contentType="text/html; charset=gbk" pageEncoding="gbk"%>
+        language：java唯一值，表示脚本中使用的编程语言
+        contentType：设置了内容的类型和静态页面的编码 (告诉浏览器以什么编码显示) 
+        pageEncoding：页面本身的编码格式 (写页面时用的编码格式) 
+        上面的代码等价于servlet里： response.setContentType("text/html; charset=gbk");
+     import：导入其他的包和类； 其中，JSP默认导入的包是java.lang.*
+        <%@page import="java.util.Date"%> //具体的包和类
+        <%@page import="java.sql.*"%>     //包下的所有类
+        <%@page import="java.util.*, java.io.*, java.net.*"%> //连写，逗号分隔
+     Session：指示当前的jsp是否参与会话 (默认为true； 参与会话) 
+        通过指令使当前页面与session不可会话：    <%@page session="false"%> 
+        session="true"时，可用内建对象session直接访问会话，例如：
+        <%  session.setAttribute("username","maxwell");
+            String name = (String)session.getAttribute("username"); %>
+        <%=name%>
+     errorPage：
+        isErrorPage：Jsp页面中出现异常的处理方式
+        对于有可能出现异常的页面： 
+            <%@page errorPage="error.jsp"%> //异常时会跳转到处理异常的页面；这页面自己写
+            在有可能异常的地方打印原因：  throw new Exception("数据库连接出错");
+        对于处理异常的页面(error.jsp)里：
+            <%@page isErrorPage="true"%>，其中使用<%=exception.getMessage() %>把异常信息打印出来
+     isThreadSafe——此属性已经不再使用(已废弃) 
+        当前Jsp页面是否线程安全    default--->true
+        <%@page isThreadSafe="true"%>  //普通的Servlet,可以并发处理用户请求
+        <%@page isThreadSafe="false"%> //相当于Servlet实现了SingleThreadModel
+   2.include指令
+        把目标页面的内容包含到当前页面,产生页面叠加以后的输出效果 //相当于将两个页面合并；编译时就包含进来
+        <%@include file="foot.jsp"%> //可插入任意位置
+   3.taglib指令
+        留在JSTL里讲解。
+
+五、JSP中的注释
+   1.java格式注释
+      编译器会忽略掉此类注释中的内容(客户端的源码看不见) 
+      <%-- JSP注释；可多行 --%> 
+      <%// java 单行注释 %>
+      <%/* java multi lines comments */%> 
+      <%/**java 特有的注释*/%>
+   2.html风格注释
+      编译器会执行此类注释中的代码(客户端的源码看得见) 
+      <!-- html风格注释 -->  等价于out.println("<!-- html风格注释 -->") 
+      这种注释方式不好的地方就是当页面注释信息太多的时候会增大服务器的负荷。
+      还有注释信息需要在网络上传输，从而降低效率；内部程序员的测试数据一般不能写在这种注释中，以免泄露。
+
+六、动作(Action) 
+    <jsp:actionName attributeName=attributeValue/>
+   JSP的动作包括：
+     forward、include、useBean、setProperty、getProperty
+   1.forward动作
+     形式：<jsp:forward page="another.jsp"/>
+          等价于 Servlet中通过RequestDispatcher.forward();
+     可以传参数
+         <jsp:forward  page="another.jsp">
+            <jsp:param name="name" value="maxwell"/>
+            <jsp:param name="age" value="20" />
+         </jsp:forward>
+   2.Include动作
+     形式：<jsp:include page="another.jsp"/>
+          等价于 Servlet中通过RequestDispatcher.include();
+      Include动作也可以传参数
+          <jsp:include  page="b.jsp" flush="true">
+             <jsp:param name="name" value="narci"/>
+          </jsp:include> 
+      与<%@include file=""%>比较：
+         include动作在运行期处理(include指令编译期)，jsp:include包含的是所包含URI的响应，而不是URI本身。
+         这意味着：jsp:include 对所指出的 URI 进行解释，因而包含的是生成的响应。
+         对于页面是静态内容，这没有太大的关系。但如果是动态内容，include动作可传参数。
+      flush 属性
+         flush 指示在读入包含内容之前是否清空任何现有的缓冲区。
+         JSP 1.1 中需要 flush 属性，因此，如果代码中不用它，会得到一个错误。
+         但是，在 JSP 1.2 中， flush 属性缺省为 false。
+         建议：由于清空大多数时候不是一个重要的问题，因此，对于 JSP 1.1，将 flush 设置为 true；
+              而对于 JSP 1.2 及更高版本，将其设置为 false 或不设置(用默认值)。
+
+
+JSP的生命周期
+    1) 每一个JSP都会对应有一个servlet生成
+    2) 在 %tomcat%/work/Catalina/localhost/工程名/org/apache/jsp 目录下可找到对应生成的 Servlet 文件
+    3) 一般而言，每一个JSP对应的servlet都有如下的生命周期方法：
+
+一、 _jspInit()方法
+    JSP容器第一次装载jsp文件时调用一次
+    public void _jspInit(){……} 
+
+二、 _jspService()方法
+    每当服务器接收到对该jsp的请求，都需要调用一次该方法一次。
+    public void _jspService(HttpServletRequest request, HttpServletResponse response)
+       throws java.io.IOException, ServletException { ……}
+
+三、 _jspDestroy()方法
+    jsp文件被修改时，JSP容器会销毁旧的jsp文件对应的对象，重新装载一次更新后的jsp文件的内容(只调用一次)。
+    public void _jspDestroy(){……} 
+
+
+JSP处理过程：JSP源文件处理分成二个阶段： 
+	1) JSP页面转换阶段：
+	   页面被编译成一个Java类，所有的HTML标记和JSP标记都被转换创建一个Servlet。这时，脚本和表达式还没有被执行;
+	2) 请求处理阶段：发生在服务器，将一个客户端请求指向JSP页面。
+	   一个请求对象创建、解析以及提交给编译好的JSP对应的servlet。
+	   当这个servlet处理请求的时候它执行先前在JSP中定义的处理脚本小程序和表达式。
+
+使用脚本代码的缺点和指导方针
+	1) 缺点：
+	   a. 过度使用脚本代码使用JSP页面混乱和难以维护; 
+	   b. 脚本代码降低JSP二个主要的优点：软件重用和代码分开
+	2) 指导方针：只在组件功能无能为力或需要有限的脚本时使用。 
+
+
+
+
+day2
+  POJO： Plain Old Java Object  --> 简单传统的Java对象
+  Java Bean： 组件、构件的规范(属性，提供get/set方法；还可包含其他方法) 
+JSP调用JavaBean
+  通过引入JavaBean，JSP才能较好的把页面展示与业务逻辑分离。
+  其中，业务逻辑放到后台的Java Bean中，减少JSP中的脚本代码，有利于程序的可维护性与可重用性。
+一、Java Bean
+     a.无参构造器(也是默认的构造方法) 
+     b.标准的getter、setter方法
+     c.如要进行网络传输(支持RMI)，需实现Serializable接口
+二、如何在JSP中使用JavaBean？
+   1.定义Java Bean
+     形式：<jsp：useBean id = "BeanName" class = "className"  sope="范围域">
+        id   ——声明bean对象的标识符，方便其他地方使用
+        class——bean对象的类型，注意要使用完全限定名
+        scope——java bean对象的共享范围(page、request、session、application) 
+           page:当前页面范围(范围最小，生命周期最短) 
+           request:同一个请求范围 (forward,include) 
+           session:同一个会话(30分钟不使用，会自动结束) 
+           application:同一个应用(范围最大，生命周期最长)  ServletContext
+     例如：  SuperGirl <jsp:useBean id="girl" class="com.tarena.vo.SuperGirl" scope="session"/> 
+     等价于：<% SuperGirl girl=(SuperGirl)session.getAttribute("girl");
+           if(girl==null){
+              girl = new SuperGirl(); //对应 id 和 class
+              session.setAttribute("girl",girl);  //对应 scope 的值
+           } %> 
+     可以用表达式获得bean的值：  <%=girl.getName();%> 
+   2.对JavaBean的属性赋值
+     形式：<jsp:setProperty name="JavaBean对象名" property="JavaBean属性名" value="属性值"/> 
+        例子：   <jsp:setProperty name="girl" property="name" value="Lily"/>
+        等价于： <% girl.setName("Lily");%>
+     可以嵌套JSP表达式：
+        <jsp:setProperty name="girl" property="name" 
+         value='<%=request.getParameter("name")%>'/>
+     Java Bean中的属性名与form中输入域的名字保持一致的话，可以使用通配符*，一次设置所有字段的值。
+        <jsp:setProperty name="" property="*"/>
+   3.获取JavaBean的属性值
+     形式：<jsp:getProperty name="" property=""/> 
+        name：标识具体的Bean对象，这与<jsp:useBean>标准动作中的id值相匹配
+        property：标识属性中的标识符。
+
+JSP中的异常处理
+一、try/catch/finally/throws/throw
+    // 在局部代码里处理异常。
+二、errorPage, isErrorPage
+    // 在整个页面处理异常。
+   1.errorPage
+     形如： <%@page errorPage="error.jsp"%>
+     表示：需要错误处理的页面
+   2.isErrorPage
+     形如： <%@page isErrorPage="true"%> 
+     指示：错误页面。其中，有一个隐式对象exception可用： <%=exception%>
+          产生(隐含)内建对象exception,可通过它获得异常信息
+          <%=exception.getMessage() %> //把异常信息打印出来
+三、声明的方式处理异常
+    // 在整个应用处理异常。(范围比前两种更大) 
+   1.配置： 在web.xml进行配置异常处理
+      …… <error-page>
+           <exception-type>java.lang.ArithmeticException</exception-type>
+           <location>/MathError.jsp</location>
+         </error-page>
+         <error-page>
+           <error-code>404</error-code>
+           <location>/404.jsp</location>
+         </error-page>  ……
+   2.复习：Java中的异常——有2种
+     受查异常(Checked Exception) 
+     非受查异常(Unchecked Exception)  Java中的RuntimeException及其子类是不需要处理的(try/catch) 
+        因为所有的RuntimeException总是可以通过优化代码来避免，因此，这种异常被称为"Unchecked Exception"。
+   3.思考：
+     三种异常处理方式同时启动用，那个优先级高？ 作用域越小，优先级越高。
+   注意：要使得页面自动跳转到错误页面，必须关闭浏览器的"显示友好HTTP错误信息"选项。
+      public void _jspService(HttpServletRequest request, HttpServletResponse response) 
+        throws java.io.IOException, ServletException { /*只处理这两种兼容的异常*/ …… }
+
+
+安全的系统(企业级应用)：
+   1.身份认证(合法用户)  --登录
+   2.授权(静态)        --定义权限
+   3.访问控制(动态)     --比较
+   4.安全审计(日志)     --修复bug (只有敏感的部门需要) 
+JAAS实现安全
+   JAAS——Java Authentication and Authorization Service
+   (Java认证(Authentication)与授权(Authorization)服务)
+   是Java EE规范之一，实现Java EE应用程序安全性的一个重要途径
+   (要求：会使用，不必深入理解) 
+一、网络安全的4大要素
+   认证——抵御假冒者(用户身份的合法性) 
+   授权——合法用户拥有的权限
+   机密性——防止关键数据落入其他人手中
+   数据完整性——抵御窃听者(篡改私有数据) 
+二、对于Http应用是如何进行认证的(Web端的认证方法)？
+   四种安全认证： (http协议)basic, form, digest, certificate(证书) + ssl
+   HttpMonitor监控受限资源的访问
+三、容器是如何完成认证与授权的呢？
+   图示(容器做了些什么事情) 
+   (容器的角度) 
+四、声明式安全以及分工
+   Servlet的开发者
+   应用的管理员
+   部署人员
+
+五、实战
+  1.定义新用户与角色
+    在Tomcat服务器中定义：    %TOMCAT_HOME%/conf/tomcat-user.xml
+     <?xml version='1.0' encoding='utf-8'?>
+     <tomcat-users>
+      <role rolename="manager"/>
+        <role rolename="admin"/>
+        <user username="maxwell" password="123" roles="admin,manager"/>
+        <user username="lily" password="iloveyou" roles="manager"/>
+     </tomcat-users>
+    为什么tomcat可以使用tomcat-users.xml作为它保存用户和角色信息的文件？原因是在server.xml中，有以下配置：
+     <Resource name="UserDatabase" auth="Container"  type="org.apache.catalina.UserDatabase"
+         description="User database that can be updated and saved"
+         factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
+         pathname="conf/tomcat-users.xml" />
+     在DD中指定角色，则需在 web.xml 中配置：
+     <security-role>
+        <description />
+        <role-name>admin</role-name>
+     </security-role>
+   2.声明安全性约束(指明受限资源) 
+     在DD中加入<security-constraint>元素，其中包含了：
+       Web资源集合：<web-resource-collection>
+       其中包含了url资源以及http方法。
+     授权约束：<auth-constraint>
+      <security-constraint>
+        <display-name>Constraint-all</display-name>
+        <web-resource-collection>
+           <web-resource-name>all-resources</web-resource-name>
+           <description />
+           <url-pattern>/admin/＊</url-pattern>    //被授权访问的目录和文件
+           <url-pattern>/security/＊</url-pattern>
+           <http-method>GET</http-method>
+           <http-method>POST</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+           <description />
+           <role-name>admin</role-name>
+        </auth-constraint>
+      </security-constraint>
+
+     要注意的规则：
+      不要认为：资源本身受到约束；其实，是资源 + Http方法组合受到约束
+      如果配置中不指定<http-method>，说明所有的方法(Get,Post,Trace,Head,Delete,Put,Options等)都受约束；
+      当指定了具体的<http-method>，那么约束只针对该方法，其他的http方法都不在约束之内；
+      <auth-constraint>定义的是哪些角色可以做出受约束的请求；而不是定义访问<web-resource-collection>
+      没有<auth-constraint>：任何角色都能访问；   空的<auth-constraint />任何角色都不能访问；
+      对于不同的<security-constraint>，指定的url资源<url-pattern>在相同方法上定义了不同的<auth-constrain>，则存在合并规则。
+
+     问题：为什么要设置<auth-constraint />元素，使得任何角色的任何人都不能访问受限资源呢？其意义何在？
+        为了保护资源，只允许内部跳转去访问
+
+   3.选择认证方式
+     如果是BASIC认证：则无需指定Form表单的action。
+     <login-config>
+         <auth-method>BASIC</auth-method>
+         <realm-name>UserDatabaseRealm</realm-name>
+     </login-config>
+     如果是FORM认证：
+     <login-config>
+       <auth-method>FORM</auth-method>
+       <form-login-config>
+          <form-login-page>/logon/loginForm.jsp</form-login-page>
+          <form-error-page>/logon/loginErrorForm.jsp</form-error-page>
+       </form-login-config>
+     </login-config>
+
+     对于Form表单认证
+      action的值，用户名、密码字段的名称都是固定的(规范) 
+      <form method="POST" action="j_security_check">      
+        <input type="text" name="j_username">      
+        <input type="password" name="j_password">      
+        <input type="submit" value="Submit" name="B1">
+      </form>
+     标准的表单提交(固定不变)：
+      action：j_security_check
+      name:j_username
+      password:j_password
+
+
+
+
+
+
+
+
+
+
+Day3
+内容要点： 1.隐含对象 2.欢迎文件 3 MVC
+********************************************************************************************
+一、隐含对象 
+ 1.什么是隐含对象(9个)？
+   ————JSP中的隐含对象:不用我们手工去创建的对象
+   类型                    对象名            功能
+   ---------------------------------------------------------------------
+   JspWriter              out              往浏览器写内容
+   HttpServletRequest     request          Http请求对象.
+   HttpServletResponse    response         Http响应对象
+   PageContext            pageContext      JSP的页面上下文
+   HttpSession            session          会话对象
+   ServletContext         application      应用上下文
+   ServletConfig          config           JSP的ServletConfig
+   Object                 page             页面实现类的对象(例如：this) 
+   Exception              exception        含有指令<%@page isErrorPage="true"%>
+
+ 2.范围对象
+   其中，有4个是范围对象： pageContext,request,session,application
+   对应<jsp:useBean/>指令的scope分别是：page,reqeust,session,application
+   也就是说，指定不同scope的bean对象(Java Bean)会被绑定到不同的范围对象中
+   // 选择范围对象的原则：作用域的范围越小越好；因为作用域小的生命周期短，有利于性能提高。
+   例如：<jsp:useBean id="stu" class="vo.Student" scope="page"/>
+   表示stu对象被绑定到javax.servlet.jsp.PageContext对象(pageContext)中，其等价的代码
+   <%    Student stu = pageContext.getAttribute("stu");
+         if(stu==null) {
+          stu=new Student();
+          pageContext.setAttribute("stu",stu);
+   }%>
+
+   1)pageContext对象：
+     每一个jsp页面对应着一个pageContext。一般地，在实际应用中，主要是使用它来存取属性。
+     另外，pageContext对象能够存取其他隐含对象。
+    a.pageContext对象存取其他隐含对象属性的方法，此时需要指定范围的参数。
+      Object getAttribute(String name, int scope)
+      Enumeration getAttributeNamesInScope(int scope)
+      void removeAttribute(String name, int scope)
+      void setAttribute(String name, Object value, int scope)
+     其中，范围参数有四个，分别代表四种范围：
+      PAGE_SCOPE、REQUEST_SCOPE、SESSION_SCOPE、APPLICATION_SCOPE
+    b.PageContext对象取得其他隐含对象的方法
+      Exception getException()           回传目前网页的异常，不过此网页要为error page，
+      JspWriter getOut()                 回传目前网页的输出流，例如：out 
+      Object getPage()                   回传目前网页的Servlet 实体(instance)，例如：page
+      ServletRequest getRequest()        回传目前网页的请求，例如：request
+      ServletResponse getResponse()      回传目前网页的响应，例如：response
+      ServletConfig getServletConfig()   回传目前此网页的ServletConfig 对象，例如：config
+      ServletContext getServletContext() 回传目前此网页的执行环境(context)，例如：application
+      HttpSession getSession()           回传和目前网页有联系的会话(session)，例如：session
+    c.PageContext对象提供取得属性的方法
+      Object getAttribute(String name, int scope)    回传name 属性(范围为scope；类型为Object) 
+      Enumeration getAttributeNamesInScope(int scope)    
+                                       回传所有属性范围为scope 的属性名称，回传类型为Enumeration
+      int getAttributesScope(String name)回传属性名称为name 的属性范围
+      void removeAttribute(String name)  移除属性名称为name 的属性对象
+      void removeAttribute(String name, int scope)   移除属性名称为name，范围为scope 的属性对象
+      void setAttribute(String name, Object value, int scope)        
+                                       指定属性对象的名称为name、值为value、范围为scope
+      Object findAttribute(String name)  寻找在所有范围中属性名称为name 的属性对象
+
+   2)request 对象
+     request 对象包含所有请求的信息，
+     如：请求的来源、标头、cookies和请求相关的参数值等等。
+     request 对象实现javax.servlet.http.HttpServletRequest接口的，
+     所提供的方法可以将它分为四大类：
+     (1)储存和取得属性方法；
+      void setAttribute(String name, Object value)      设定name属性的值为value
+      Enumeration getAttributeNamesInScope(int scope)   取得所有scope 范围的属性
+      Object getAttribute(String name)   取得name 属性的值
+      void removeAttribute(String name)  移除name 属性的值
+     (2)取得请求参数的方法
+      String getParameter(String name)   取得name 的参数值
+      Enumeration getParameterNames()    取得所有的参数名称
+      String [] getParameterValues(String name)    取得所有name 的参数值
+      Map getParameterMap()              取得一个要求参数的Map
+     (3)能够取得请求HTTP 标头的方法
+      String getHeader(String name)      取得name 的标头
+      Enumeration getHeaderNames()       取得所有的标头名称
+      Enumeration getHeaders(String name) 取得所有name 的标头
+      int getIntHeader(String name)      取得整数类型name 的标头
+      long getDateHeader(String name)    取得日期类型name 的标头
+      Cookie [] getCookies()             取得与请求有关的cookies
+     (4)其他的方法
+      String getContextPath()            取得Context 路径(即站台名称)
+      String getMethod()                 取得HTTP 的方法(GET、POST)
+      String getProtocol()               取得使用的协议 (HTTP/1.1、HTTP/1.0 )
+      String getQueryString()            取得请求的参数字符串，不过，HTTP的方法必须为GET
+      String getRequestedSessionId()     取得用户端的Session ID
+      String getRequestURI()             取得请求的URL，但是不包括请求的参数字符串
+      String getRemoteAddr()             取得用户的IP 地址
+      String getRemoteHost()             取得用户的主机名称
+      int getRemotePort()                取得用户的主机端口
+      String getRemoteUser()             取得用户的名称
+      void getCharacterEncoding(String encoding)    设定编码格式，用来解决窗体传递中文的问题
+
+    3)session 对象
+     session对象表示目前个别用户的会话(session)状况。
+     session对象实现javax.servlet.http.HttpSession接口，HttpSession接口所提供的方法
+      long getCreationTime()             取得session产生的时间，单位是毫秒
+      String getId()                     取得session 的ID
+      long getLastAccessedTime()         取得用户最后通过这个session送出请求的时间
+      long getMaxInactiveInterval()      取得最大session不活动的时间，若超过这时间，session 将会失效
+      void invalidate()                  取消session 对象，并将对象存放的内容完全抛弃
+      boolean isNew()                    判断session 是否为"新"的会话
+      void setMaxInactiveInterval(int interval)   
+                                       设定最大session不活动的时间，若超过这时间，session 将会失效
+    4)application对象
+     application对象最常被使用在存取环境的信息。
+     因为环境的信息通常都储存在ServletContext中，所以常利用application对象来存取ServletContext中的信息。
+     application 对象实现javax.servlet.ServletContext 接口，ServletContext接口容器所提供的方法
+      int getMajorVersion()              取得Container主要的Servlet API版本
+      int getMinorVersion()              取得Container次要的Servlet API 版本
+      String getServerInfo()             取得Container的名称和版本
+      String getMimeType(String file)    取得指定文件的MIME 类型
+      ServletContext getContext(String uripath)        取得指定Local URL的Application context
+      String getRealPath(String path)    取得本地端path的绝对路径
+      void log(String message)           将信息写入log文件中
+      void log(String message, Throwable throwable)    将stack trace 所产生的异常信息写入log文件中
+
+ 3.其他对象：
+    1)page 对象
+     page对象代表JSP本身，更准确地说page对象是当前页面转换后的Servlet类的实例。
+     从转换后的Servlet类的代码中，可以看到这种关系： Object page = this;
+     在JSP页面中，很少使用page对象。
+    2)response 对象
+     response 对象主要将JSP 处理数据后的结果传回到客户端。
+     response 对象是实现javax.servlet.http.HttpServletResponse 接口。response对象所提供的方法。
+    a.设定表头的方法
+      void addCookie(Cookie cookie)                新增cookie
+      void addDateHeader(String name, long date)   新增long类型的值到name标头
+      void addHeader(String name, String value)    新增String类型的值到name标头
+      void addIntHeader(String name, int value)    新增int类型的值到name标头
+      void setDateHeader(String name, long date)   指定long类型的值到name标头
+      void setHeader(String name, String value)    指定String类型的值到name标头
+      void setIntHeader(String name, int value)    指定int类型的值到name标头
+    b.设定响应状态码的方法
+      void sendError(int sc)                       传送状态码(status code)
+      void sendError(int sc, String msg)           传送状态码和错误信息
+      void setStatus(int sc)                       设定状态码
+    c.用来URL 重写(rewriting)的方法    
+      String encodeRedirectURL(String url)         对使用sendRedirect()方法的URL予以编码
+    3)out 对象
+     out对象的类型是javax.servlet.jsp.JspWriter，该类从java.io.Writer类派生，以字符流的形式输出数据。
+     out对象实际上是PrintWriter对象的带缓冲的版本(在out对象内部使用PrintWriter对象来输出数据)，
+     可以通过page指令的buffer属性来调整缓冲区的大小，默认的缓冲区是8kb。
+     out 对象能把结果输出到网页上。
+     out主要是用来控制管理输出的缓冲区(buffer)和输出流(output stream)。
+      void clear( )               清除输出缓冲区的内容
+      void clearBuffer( )         清除输出缓冲区的内容
+      void close( )               关闭输出流，清除所有的内容
+      int getBufferSize( )        取得目前缓冲区的大小(KB)
+      int getRemaining( )         取得目前使用后还剩下的缓冲区大小(KB)
+      boolean isAutoFlush( )      回传true表示缓冲区满时会自动清除；false表示不会自动清除并且产生异常处理
+    4)exception对象
+     若要使用exception 对象时，必须在page 指令中设定：<%@ page isErrorPage="true" %>才能使用。
+     exception提供的三个方法：
+      getMessage() 
+      getLocalizedMessage() 
+      printStackTrace(new java.io.PrintWriter(out)) 
+    5)config 对象
+     config 对象里存放着一些Servlet 初始的数据结构。
+     config 对象实现于javax.servlet.ServletConfig 接口，它共有下列四种方法：
+      public String getInitParameter(name)
+      public java.util.Enumeration getInitParameterNames( ) 
+      public ServletContext getServletContext() 
+      public Sring getServletName() 
+
+
+例子：
+1.范围对象比较
+<% pageContext 或request 或session 或application.setAttribute("name", "maxwell");
+   pageContext.setAttribute("sex", "m");
+%>
+
+2.输出对象out
+<%out.println("Hello JSP!");%>
+<%System.out.println("Hello JSP!");%>
+getBufferSize() //tomcat default:12k
+getRemaining()
+flush()
+clearBuffer()
+
+3.request对象
+request:
+getProtocol()
+getMethod()
+getHeader("User-Agent")
+getCookies()
+getRequestURI()
+getRequestURL()
+getContextPath()
+getServletPath()
+getPathInfo()
+getQueryString()
+isRequestedSessionIdFromCookie()
+isRequestedSessionIdFromURL()
+isRequestedSessionIdValid()
+getLocalPort(),getRemotePort()
+getRequestDispatcher(),setCharacterEncoding(),getInputStream()
+
+4.session对象
+session:
+getId()
+isNew()
+invalidate()
+setMaxInactiveInterval(10)
+
+
+5.响应对象
+response:
+sendRedirect("third.jsp")
+sendError(404, "400 Error!")
+6.应用对象
+application:
+log("some body visit our website...");
+getMajorVersion()
+getMinorVersion()
+getServerInfo()
+getRequestDispatcher(),getResourceAsStream(),getInitParameter()
+
+pageContext:
+getAttribute("name")
+
+config:
+getInitParameter("classNo")
+getServletName()
+
+page:
+getClass()
+
+
+
+************************************************************************************************
+二、欢迎文件
+
+ 1.缺省情况下,一个Web App中的  index.html, index.htm, index.jsp  可作为默认的欢迎文件.
+   当用户请求没有指明要访问的资源时,Web Container会用欢迎文件响应客户端请求.
+ 2.手工设置欢迎文件：
+   web.xml
+   找welcome.jsp，没找到，继续往下找
+   <welcome-file-list>
+     <welcome-file>/welcome.jsp</welcome-file>
+     <welcome-file>/welcome1.jsp</welcome-file>
+     <welcome-file>/welcome2.jsp</welcome-file>
+   </welcome-file-list>
+
+
+
+
+三、MVC
+ MVC:    Model-View-Controller (用户交互过程：输入、处理、输出) 
+ WEB应用的MVC；优化Web App的结构,使用MVC模式
+ Model 1:    JSP + JavaBean(EJB)
+ Model 2:    Servlet + JSP + JavaBean(EJB)------>MVC
+
+体系结构
+
+设计模式
+  具体问题提出具体的解决办法
+
+习惯用法
+
+
+
+
+
+
+
+
+
+
+Day4
+内容要点： 1 实现文件上传  2 数据验证  3 分页实现
+*****************************************************************************************
+一、文件上传
+1.表单形式
+<form action="" method="POST" enctype="multipart/form-data">
+  file:<input type="file" name="file"/><br/>
+  <input type="submit"/>
+</form>
+
+2.使用HttpMonitor工具：
+查看文件上传时，请求的内容。
+
+
+
+3.服务器端对上传文件的处理
+例子
+fileupload
+处理步骤(待补充) 
+
+
+
+知识点：
+1)通过HttpServletRequest来传送文件内容
+2)处理request头，字符串的分析
+3)java.io.File API的使用
+
+
+
+*****************************************************************************************
+二、数据验证
+
+如何完成Web App中的数据验证工作
+
+1)客户端校验：
+输入域不能为空，只能是数字，数据长度大于5等等
+JavaScript客户端完成(验证框架，负责客户端方面的验证)
+
+2)服务器端校验：
+例如：后台数据库要求提交数据唯一性
+Java服务器端完成(没有现成的框架，因为不同的项目有不同的业务规则)
+
+
+重点：
+1)分清楚什么情况下使用客户端校验，什么情况下使用服务器端校验
+
+
+
+
+***************************************************************************************
+三、数据分页
+查询数据库时，如果满足条件的记录很多，该如何返回给页面?
+1.客户端分页
+  同样地，使用html/javascript等技术处理。甚至可以封装成组件
+2.服务器端分页
+  非常重要的，在实际项目中非常需要————性能问题。
+这需要结合JDBC/Hibernate/TopLink/EJB等技术实现。
+
+查询分页
+  1)一次性从数据库中查出所有信息，在内存中作分页(缓存) 
+      特点：速度非常快,消耗资源大(内存?) 
+
+  2)分多次查询数据库，一次查询的数据量就是一个页面可以显示的数据量
+      特点：消耗资源少，相对来说速度慢
+
+  3)折衷的方案(一次只取n页，1<n<总页数)(部分缓存) 
+      特点：中庸之道(实现中，置换算法教难) 
+
+常见的分页处理方法：定义如下几个参数
+rows:数据库表中记录总行数   select count(*) from 表名;
+  totalPage：总页数     (导出属性：可以由其他属性计算而得) int totalPage = rows / size + 1;
+size：每页显示的记录数目    可定制，可写死
+curPageNo：当前页         客户端决定
+  startRowNo：当前页在数据库中的起始行号(导出属性)        int startRowNo = (curPageNo -1 ) * size;
+
+练习：
+重新改造Usermanager例子中的查询所有的用户的功能(使用分页) 
+
+
+
+
+
+
+
+
+
+
+
+
+Day5
+内容要点：  1 EL   2 JSTL
+**************************************************************
+一、EL(Expression Language----表达式语言) 
+ 为网页美工而设，跟java语句相似；尽量减少java程序的依赖(不能要求美工使用java) 
+ 1.语法
+   表达式          vs.    EL表达式语言(JSP2.0) 
+   <%=name%>     <=>       ${name} 
+ 2.文字
+   在 EL 表达式中，数字、字符串、布尔值和 null 都可以被指定为文字值(常量)。
+   字符串可以用单引号或双引号定界。布尔值被指定为 true 和 false 。
+  例子：
+   表达式                              值
+   -----------------------------------------------------------------------
+   ${-168.18}                         -168.18
+   ${3.8e-18}                         3.8e-18           //科学计数法
+   ${3.14159265}                      3.14159265                  
+   ${"Hello JSP EL!"}                 Hello JSP EL!     等价于 <%="Hello JSP EL!"%>          
+   ${'Hello JSP EL...'}               Hello JSP EL...
+   ${true}  //can be TRUE?            true
+   ${false} //can be FALSE?           false
+   ${str==null}                       true              //布尔值的表达式
+
+ 3.EL 运算符
+   类别               运算符
+   -------------------------------------------------------------
+   算术运算符        +、  -、  *、  /(或 div)、    %(或 mod)
+   关系运算符        ==(或 eq)、    !=(或 ne)、    <(或 lt)
+                 >(或 gt)、     <=(或 le)、    >=(或 ge)
+   逻辑运算符        &&(或 and)、   ||(或 or)、    !(或 not)
+   验证运算符        empty  
+     其中，empty 判断一个变量是否为null或是否包含有效数据:
+     if(name==null||name.equlas(""))  等价于  ${empty name} ->    true
+  例子：
+    表达式                              值
+   -------------------------------------------------------------
+    ${3+5.1}                           8.1
+    ${"Hello"+",Tarena!"}              报错！  // EL的"+"没有字符串连接功能
+    ${5*2}                             10
+    ${9.3/3}                           3.1
+    ${9.3 div 3}                       3.1
+    ${8 div 0}                         Infinity // 表示无穷大
+    ${9%2}                             1
+    ${9 mod 2}                         1
+    ${8*6>68?"Yes":"No"}               No   //三目表达式
+   <% String name="";
+    request.setAttribute("name",name);      //如果没有 setAttribute ，则必定是空
+   %>
+    ${empty name}                      true //对范围对象内的变量或对象进行判空
+
+ 4.变量和JavaBean属性数据输出
+   表达式语言输出变量，是到范围对象(pageContext,request,session,application)中查找相应属性。
+   而非直接在页面中查找实例或局部变量。
+  表达式语言查找变量的顺序是:
+   pageContext -> request -> session->application， 所有范围都未找到时，赋值null
+
+ 5.存取器
+   []    ->输出对象属性值，输出数组或集合中对应索引值
+   .     ->输出对象属性值
+  例子：
+   <% SuperGirl girl = new SuperGirl();   girl.setName("Alice");
+      session.setAttribute("girl",girl);  %>  //一定要有这句，设置成范围对象
+   ${girl["name"]}
+   ${girl['name']}   //拿属性时，单引跟双引等价
+   ${girl.name}      //这种方法同样可以
+   
+   <%  List aList = new ArrayList();
+       aList.add("China");  aList.add(girl);  aList.add(168.18);
+       session.setAttribute("aList", aList); %>
+   ${aList[0]}   //使用下标来取值 "China"
+   ${aList[1]}   //取得对象的引用地址  还可以嵌套：${aList[1]['name']}
+   ${aList[3]}   //下标越界，不会报错；只是取不出值
+   
+   <%  Map map = new HashMap();
+       map.put("name", "Kitty");  map.put("age", "25");  map.put("date", new Date());
+       map.put("aList", aList);
+       session.setAttribute("map", map); %>
+   ${map.date}     ${map["date"]}     //这两个等效
+   ${map.aList[0]} ${map["aList"][0]} //这两个也等效
+   ${map.aList[1][name]}              //嵌套取值
+
+ 6.隐含对象
+   el提供了自己的一套隐含对象，方便在页面内对各种常用数据信息的访问.
+    EL隐藏对象                         JSP隐藏对象
+   --------------------------------------------------------------------------------
+    pageScope                         pageContext
+    requestScope                      request
+    sessionScope                      session
+    applicationScope                  appication
+
+    param：               request.getParameter() 
+    paramValues：         在提交表单里，有多个输入域同名getParameterValues
+    header：              request.getHeader() 按照key-value的形式取出；value:是一个String类型的值
+    headerValues          按照key-value的方式取出，但是headerValues里面的value是一个String类型的数组
+    cookie                request.getCookies() 
+    initParam             context param
+
+  例子：
+    1)超女登记信息  
+      enroll.html
+      <form action="index.jsp" method="post"> 
+        <table border="1"> 
+        <tr><td>姓名：</td> 
+            <td><input type="text" name="name"></td></tr> 
+        <tr><td>年龄：</td> 
+            <td><input type="text" name="age"></td></tr>  
+        <tr><td>城市：</td> 
+            <td><input type="text" name="city"></td>  </tr>  
+        <tr><td align="center" colspan="2"><input type="submit" value="提交"></td></tr> 
+        </table>
+      </form>
+
+      index.jsp
+      <jsp:useBean id="SuperGirl" class="vo.SuperGirl" scope="page"></jsp:useBean>
+      <jsp:setProperty name="SuperGirl" property="name" value="${param.name}"/>
+      <jsp:setProperty name="SuperGirl" property="age"  value="${param.age}"/>
+      <jsp:setProperty name="SuperGirl" property="city" value="${param.city}"/>
+      <table border="1">   <% //把设置输出出来 %>
+        <tr><td>姓名：</td> 
+            <td>${SuperGirl.name}</td></tr> 
+        <tr><td>年龄：</td> 
+            <td>${SuperGirl.age}</td></tr>  
+        <tr><td>城市：</td> 
+            <td>${SuperGirl.city}</td></tr>  
+      </table>
+
+    2)范围对象
+      <%  pageContext.setAttribute("name", "page");
+        request.setAttribute("name", "request");
+        session.setAttribute("name", "session"); 
+        application.setAttribute("name", "application"); %> 
+
+      ${name}    // pageContext -> request -> session->application
+      ${pageScope.name}
+      ${requestScope.name}
+      ${sessionScope.name}
+      ${applicationScope.name}
+
+    3)paramValues
+      在enroll.html加入： 兴趣
+        <table>
+      <input type="checkbox" name="habit" value="Reading"/>读书
+      <input type="checkbox" name="habit" value="Game"/>游戏
+      <input type="checkbox" name="habit" value="Music"/>音乐
+        </table>
+      //提交后，获取输入内容
+      ${paramValues.habit[0]}
+      ${paramValues.habit[1]}
+      ${paramValues.habit[2]}
+
+    4)initParam
+      web.xml
+      ...
+      <context-param>
+        <param-name>server</param-name>
+        <param-value>Tomcat5.5</param-value>
+      </context-param>
+      ...
+      ${initParam.server} 
+
+    5)header
+      ${header["host"]} 
+      ${header["accept"]} 
+      ${header["user-agent"]} 
+
+
+ 7.可以自由设置是否支持表达式语言
+   <%@page isELIgnored="false"%> : default:false  可以使用EL，改成 true 之后，写EL就会报错
+
+   配置web.xml也可达到同样的效果(同时存在，那种起作用？) 
+   (禁用脚本和EL)  默认都是false
+   ...
+   <jsp-config>
+     <jsp-property-group>
+       <url-pattern>*.jsp</url-pattern>
+       <el-ignored>true</el-ignored>               //设置成所有jsp文件都禁用EL
+       <scripting-invalid>true</scripting-invalid> //设置成禁用脚本
+     </jsp-property-group>
+   </jsp-config>
+   ....
+   页面的page指令设置isELIgnored属性的优先级比web.xml中<el-ignored>设置的高(当然是范围小的生效) 
+
+
+***************************************************************************************
+二、JSTL(JSP Standard Tag Library ) 
+ 减少java代码，简化页面编写；功能封装，提高可重用性
+ 1.如何使用JSTL
+   1)对于Java EE之前(即J2EE规范1.4及之前版本) 
+     a、复制jstl的jar包(jstl.jar,standard.jar)到/WEB-INF/lib
+     b、在使用jstl功能的jsp页面中增加指令
+        <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>   //核心标签库
+        <%@taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml"%>    
+        <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%> 
+        <%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>  //数据库标签库
+        <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%> 
+        //prefix 表前缀(可改，但通常按这写的用)； uri 指向标签库的入口
+   2)Java EE规范把jstl作为规范的一部分
+     所以现在的jstl-1.2已经包含了原来的jstl.jar , standard.jar
+
+ 2.core:核心标签库
+   一般用途
+   在JSTL中，一般用途的标签主要是指具有输出，设置变量，和错误处理等功能的标签，他们在jsp中使用比较频繁，它们有：
+  -----------
+  |a、<c:set>|
+  -----------
+   语法：<c:set value="value" var="varName" [scope= "{page|request|session|application}"]/ >
+        <c:set value="value" target="target" property="propertyName"/ >
+   这个标签用于在某个范围(page,request,session,application)里面设置特定的值
+   (默认为page)，或者设置某个已经存在的javabean的属性。
+   例子：
+     <c:set var="counter" value="200"/>
+     ${counter}//输出
+     
+     <c:set var="tarena">Tarena It Traning Ltd.</c:set>
+     ${tarena}
+
+   可以指定范围，默认是page
+    <c:set value="20" var="maxIdelTime" scope="session"/>
+    ${maxIdelTime}
+
+   设置JavaBean的值
+    <jsp:useBean id="girl" class="vo.SuperGirl"/>
+    <c:set value="Shirly" target="${girl}" property="name"/>
+    <td>girl.name</td>
+    <td>${girl.name}</td>
+
+  --------------
+  |b、<c:remove>|
+  --------------
+  语法：
+    <c:remove var="varName" [scope= "{page|request|session|application}"]/ >
+    它的作用是删除某个变量或者属性。
+  例子：
+    <c:set value="10000" var="maxUser" scope="application"/>
+    <c:set value="10" var="count" scope="session"/>
+    <c:set value="10" var="count"/>
+    ${maxUser}
+    ${count}
+    <c:remove var="maxUser" scope="application"/>
+    <c:remove var="count" scope="session"/>
+    ${maxUser}
+    ${count}
+
+  -----------
+  |c、<c:out>|
+  -----------
+  语法：<c:out value="value" [escapeXml]="{true|false}" [default="defaultValue"]/>
+  注意:escapeXml的作用是是否将代码交给xml解析器解释，true为交给xml解析器解释(默认)，false为交给浏览器解释。
+      default 定义缺省值。
+
+  例子：
+    <c:set var="sessionZhang3" value="zhang3-s" scope="session"/>
+    <c:set var="table" value="<table><tr><td>sessionZhang</td></tr></table>" scope="page"/>
+    <c:set var="requestZhang3" value="zhang3-r" scope="request"/>
+    <c:out value="以下输出前面设置的属性<br>" escapeXml="false"/>
+
+    <td colspan=2>
+        <c:out value="${sessionZhang3}"/><br>
+        <c:out value="${table}" escapeXml="false" /><br>//输出表格；escapeXml="true"时只显示字符串
+        <c:out value="${requestZhang3}"/><br>
+        <c:out value="${nodefined}" default="没有nodefined这个变量"/>
+    </td>
+
+  -------------
+  |d、<c:catch>|
+  -------------
+  它的作用是捕捉由嵌套在它里面的标签所抛出来的异常。类似于<%try{}catch{}%>
+  语法：<c:catch [var="varName"]>nested actions</c:catch>
+  例子：
+    <c:catch var="error"><% Integer.parseInt("abc"); %></c:catch>
+    <% try{ Integer.parseInt("abc"); }catch(Exception error) {  } %> //等价
+
+     <c:out value="${error}"/>
+     <c:out value="${error.message}"/>
+     <c:out value="${error.cause}"/>
+
+
+  控制语句：
+  -----------
+  |a、 <c:if>|  
+  -----------
+  语法： 
+    <c:if test="testCondition" var="varName" 
+    [scope="{page|request|session|application}"]>
+       Body内容
+    </c:if>  // 注：没有 else 
+  例子：
+     <c:set var="age" value="16"/>
+     <c:if test="${age<18}">
+        <h1 align=center>您尚未成年，不能进入游戏中心！</h1>
+     </c:if>
+
+  --------------
+  |b、<c:choose>|
+  --------------
+  例子：
+    <c:set var="tax" value="5000" />
+    <c:choose>
+         <c:when test="${tax <=0}">
+              您今年没有纳税！
+         </c:when>
+         <c:when test="${tax<=1000&&tax>0}">
+           您今年缴纳的税款为${tax},加油！
+         </c:when>
+         <c:when test="${tax<=3000&&tax>1000}">
+           您今年缴纳的税款为${tax},再接再励哦！
+         </c:when>
+         <c:otherwise>
+           您今年纳税超过了3000元，多谢您为国家的繁荣富强作出了贡献！
+         </c:otherwise>
+     </c:choose>
+
+  ---------------
+  |c、<c:forEach>| 循环
+  ---------------
+  语法： <c:forEach [var="varName"] items="collection"  [varStatus="varStatusName"]
+         [begin="begin"] [end="end"] [step="step"]>
+           Body 内容
+        </c:forEach>
+   items：需要迭代的集合；var：迭代时取集合里的值；
+  例子：
+    <%  List aList=new ArrayList();
+        aList.add("You");       aList.add("are");   aList.add("a");
+        aList.add("beautiful"); aList.add("girl");  
+        request.setAttribute("aList",aList);  %>
+    <center> <table border=1>
+       <c:forEach var="word" items="${aList}">
+         <tr><td>${word }</td></tr>
+       </c:forEach>
+    </table> </center>
+
+    <c:forEach items='${header}' var='h'>
+       <tr>
+         <td><li>Header name:<c:out value="${h.key}"/></li></td>
+         <td><li>Header value:<c:out value="${h.value}"/></li></td>
+       </tr>
+    </c:forEach>
+
+  另外一种用法： (类似 for 循环)
+   <c:forEach var="count" begin="10" end="100" step="10">
+       <tr><td>
+         <c:out value="${count}"/><br>
+       </td></tr>
+   </c:forEach> 
+
+
+  URL
+  ---------------
+  |a、<c:import> |
+  ---------------
+  相当于<jsp:include>
+   <c:import url="footer.jsp" charEncoding="GBK">
+      <c:param name="name" value="Java"/>
+   </c:import> 
+
+  -----------
+  |b、<c:url>|
+  -----------
+  用于构造URL，主要的用途是URL的重写。
+    <c:url var="footer1" value="footer.jsp"/>
+    <c:url var="footer2" value="footer.jsp" scope="page">
+        <c:param name="name" value="Sofie"/>
+    </c:url>
+    <c:out value="${footer1}"/>
+    <c:out value="${footer2}"/>
+
+    <c:url var="next" value="next.jsp"/>
+    <a href="${next}">next</a><br>
+       等价于
+    <a href="<c:url value='next.jsp'/>">next</a> //在 Html 里可嵌套 JSTL 
+
+  ----------------
+  |c、<c:redirect>|
+  ----------------
+   //等价于 <jsp:forward>
+    <c:redirect url="${footer2}"/>
+  例如：
+    <c:url var="next" value="next.jsp"/>
+    <c:redirect url="${next}"/>
+
+
+
+ 3.SQL
+   <sql:setDataSource>
+   <sql:query>
+   <sql:update>
+   <sql:param>
+
+    <!-- 设置数据源 -->
+    <%@page contentType="text/html; charset=GBK"%>
+    <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+    <%@taglib uri="http://java.sun.com/jsp/jstl/sql" prefix="sql"%>
+      <sql:setDataSource   var="ds"  driver="com.mysql.jdbc.Driver" 
+       url="jdbc:mysql://localhost:3306/tarena" 
+       user="root" password="11111111" />
+
+  a、查询
+    <sql:query var="rs" dataSource="${ds}" sql="select * from users" ></sql:query>
+    <c:forEach var="user" items="${rs.rows}">
+        <tr>
+          <td>${user.userid}</td>
+          <td>${user.username}</td>
+          <td>${user.password}</td>
+          <td>${user.role}</td>
+        </tr>
+    </c:forEach>
+
+  b、插入记录
+    <sql:update dataSource="${ds}" sql="insert into users values(101,'maxwell','123','admin')"
+     var="i"></sql:update>
+    <hr>插入${i}条记录.
+
+  c、更新记录
+    <sql:update dataSource="${ds}"
+     sql="UPDATE users SET username='Gavin King' WHERE userid=101" var="i"></sql:update>
+    <hr>更新${i}条记录.
+
+	<sql:param>
+	 作用：设置sql语句中"?"表示的占位符号的值。
+	<sql:update dataSource="${ds}" sql="UPDATE users SET username=? WHERE userid=?" var="i">
+    <sql:param value="Rod Johnson" /> //设第一个问号
+    <sql:param value="100" />         //设第二个问号
+  </sql:update>
+  参数等价于
+  //pstmt.setString(1,"Rod Johnson");
+  //pstmt.setInt(2,100);  
+
+
+
+
+
+
+
+
+
+
+
+
+

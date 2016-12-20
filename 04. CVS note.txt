@@ -1,0 +1,44 @@
+﻿cvs login  密码
+
+Elipse   Host:192.168.0.23    Connection type:pserver
+         Repository path:/user/cvs/openlab    User:sd08077    Password:u0
+
+启用mysql： 直接在终端输入 mysql -u root
+第一次创建项目：
+cvs import project_name  tarena start (创建沙箱－－项目)
+
+
+
+CVS commands are:
+        add          Add a new file/directory to the repository
+        admin        Administration front end for rcs
+        annotate     Show last revision where each line was modified
+        checkout     Checkout sources for editing
+        commit       Check files into the repository提交
+        diff         Show differences between revisions查看两版本间的差异。
+                     用法：diff 版本1 版本2    分左右两页显示：diff side-by-side 版本1 版本2
+        edit         Get ready to edit a watched file
+        editors      See who is editing a watched file
+        export       Export sources from CVS, similar to checkout
+        history      Show repository access history
+        import       Import sources into CVS, using vendor branches
+        init         Create a CVS repository if it doesn't exist
+        log          Print out history information for files
+        login        Prompt for password for authenticating server
+        logout       Removes entry in .cvspass for remote repository
+        pserver      Password server mode
+        rannotate    Show last revision where each line of module was modified
+        rdiff        Create 'patch' format diffs between releases
+        release      Indicate that a Module is no longer in use
+        remove       Remove an entry from the repository
+        rlog         Print out history information for a module
+        rtag         Add a symbolic tag to a module
+        server       Server mode
+        status       Display status information on checked out files
+        tag          Add a symbolic tag to checked out version of files
+        unedit       Undo an edit command
+        update       Bring work tree in sync with repository
+        version      Show current CVS version(s)
+        watch        Set watches
+        watchers     See who is watching a file
+(Specify the --help option for a list of other help options)

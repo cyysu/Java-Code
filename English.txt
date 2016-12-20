@@ -1,0 +1,101 @@
+A B C D E F G H I J K L M N O P Q R S T U V W X Y Z 
+
+编程英语：(手摘) 
+
+abstract     (关键字) 抽象 ['æbstrækt] 
+access               vt.访问,存取 ['ækses]'(n.入口,使用权) 
+algorithm            n.算法 ['ælgәriðm] 
+Annotation   [java]  代码注释 [ænәu'teiʃәn] 
+anonymous            adj.匿名的[ә'nɒnimәs]'(反义：directly adv.直接地,立即[di'rektli, dai'rektli]) 
+apply                v.应用,适用 [ә'plai] 
+application          n.应用,应用程序 [,æpli'keiʃәn]' (application crash 程序崩溃) 
+arbitrary            a.任意的 ['ɑ:bitrәri] 
+argument             n.参数;争论,论据 ['ɑ:gjumәnt]'(缩写 args) 
+assert       (关键字) 断言 [ә'sә:t] ' (java 1.4 之后成为关键字) 
+associate            n.关联(同伴,伙伴) [ә'sәuʃieit] 
+attribute            n.属性(品质,特征) [ә'tribju:t] 
+boolean      (关键字) 逻辑的, 布尔型
+call                 n.v.调用; 呼叫; [kɒ:l] 
+circumstance         n.事件(环境,状况)  ['sә:kәmstәns]
+crash                n.崩溃,破碎 [kræʃ] 
+cohesion             内聚,黏聚,结合 [kәu'hi:ʒәn] 
+                     (a class is designed with a single, well-focoused purpose. 应该不止这点) 
+command              n. 命令,指令 [kә'mɑ:nd](指挥, 控制) (command-line 命令行) 
+Comments     [java]  文本注释 ['kɒments] 
+compile      [java]  v.编译 [kәm'pail]'  Compilation n.编辑[,kɒmpi'leiʃәn]
+const        (保留字) 
+constant             n. 常量, 常数, 恒量 ['kɒnstәnt]
+continue     (关键字) 
+coupling             耦合,联结 ['kʌpliŋ]
+                     making sure that classes know about other classes only through their APIs. 
+declare      [java]  声明 [di'klєә] 
+default      (关键字) 默认值; 缺省值 [di'fɒ:lt] 
+delimiter            定义符; 定界符
+Encapsulation[java]  封装 (hiding implementation details) 
+Exception    [java]  例外; 异常 [ik'sepʃәn]
+entry                n.登录项, 输入项, 条目['entri]
+enum         (关键字) 
+execute              vt.执行 ['eksikju:t] 
+exhibit              v.显示, 陈列 [ig'zibit]
+exist                存在, 发生 [ig'zist] '(SQL关键字 exists) 
+extends      (关键字) 继承、扩展 [ik'stend] 
+false        (关键字) 
+final        (关键字) finally (关键字) 
+fragments            段落; 代码块 ['frægmәnt]  
+FrameWork    [java]  结构,框架 ['freimwә:k] 
+Generic      [java]  泛型  [dʒi'nerik] 
+goto         (保留字) 跳转
+heap                 n.堆 [hi:p] 
+implements   (关键字) 实现 ['implimәnt] 
+import       (关键字) 引入(进口,输入) 
+Info                 n.信息 (information [,infә'meiʃәn] ) 
+Inheritance  [java]  继承 [in'heritәns] (遗传,遗产) 
+initialize           预置 初始化 [i'niʃәlaiz] 
+instanceof   (关键字) 运算符，用于引用变量，以检查这个对象是否是某种类型。返回 boolean 值。
+interface    (关键字) 接口 ['intәfeis] 
+invoke               vt.调用 [in'vәuk]'  ( invocation [,invәu'keiʃәn]) 
+Iterator     [java]  迭代器, 迭代程序
+legal                合法的 ['li:gәl] 
+log                  n.日志,记录 [lɒg]
+native       (关键字) ？？ ['neitiv] 
+nested       [java]  嵌套的 ['nestid] '如：内部类(nested classes)
+Object       [java]  对象 ['ɒbdʒekt] 
+Overload     [java]  方法的重载(不同参数列表的同名方法) [,әuvә'lәud] 
+Override     [java]  方法的覆盖(覆盖父类的方法) [,әuvә'raid] 
+polymiorphism[java]  多态 (polymorphism 多形性[,pɒli'mɒ:fizm]) 
+                     allowing a single object to be seen as having many types.
+principle            n.原则,原理,主义 ['prinsipl]
+priority             n. 优先级 [prai'ɒriti]
+process              n. 程序, 进程 ['prɒses]
+protected    (关键字) 受保护的,私有的 [prә'tektid] 
+provide              v.规定(供应,准备,预防)[prә'vaid] 
+refer to             v.引用 [ri'fә:][tu:]
+reference            n. 参考(引用,涉及)['refәrәns]'  -->reference variable 参量, 参考变量,引用变量
+Reflection   [java]  反射 [ri'flekʃәn] 
+script               n.手写体,小型程序 [skript] 
+serialized           vt.序列化,串行化 ['siәriәlaiz]'(serializable adj.)(deserialize反序列化,反串行化)
+Socket       [java]  网络套接字['sɒkit] 
+stack                n.堆栈 [stæk] (对应 heap 堆) 
+statement            程序语句; 语句 ['steitmәnt]' n. 陈述,指令
+subclass             n.子类 ['sʌbklɑ:s]' (supertype 父类) 
+switch       (关键字) 选择语句。 n.开关,道岔 [switʃ]
+synchronized (关键字) 同步(锁) ['siŋkrәnaiz] 
+Thread       [java]  线程 [θred] 
+throw        (关键字) throws  (关键字) [θrәu] 抛出(异常) 
+transient    (关键字) 瞬变;临时的['trænziәnt]'(可序列化) 
+valid                正确的,有效的 ['vælid]  
+variable             n.变量 a.可变的['vєәriәbl] 
+volatile     (关键字) 不稳定的['vɒlәtail] 
+while        (关键字) 循环语句。 当...的时候 [hwail]
+
+
+
+
+
+
+
+
+
+
+
+

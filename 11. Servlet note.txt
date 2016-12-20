@@ -1,0 +1,1182 @@
+
+"*"表示重要性，星号越多越重要
+
+day1 
+一、 Web应用基础
+1.B-S架构(***) 
+  架构的发展
+  c/s vs. b/s
+    c/s架构 (client客户端-server服务端) 
+        (胖客户端:要求客户端运行业务；把业务放到服务器端，则是瘦客户端) 
+        典型的c/s应用：ftp工具、QQ、邮件系统、杀毒软件...
+        1.建立在tcp/ip协议之上，有自己的通信规则(建立业务) 
+        2.需要相互配合才能完成一个完整业务逻辑
+        3.允许多个客户端程序同时接入一个server程序(并发) 
+        4.每一个client(机器)都必须安装客户软件
+        5.修改了server程序，通常client程序都要修改(升级) 
+        优点：利用客户端的计算能力，分担服务器的负荷(大型网络游戏就利用这点) 
+        缺点：用户必须安装客户端程序；客户端需要升级(麻烦) 
+    b/s架构 (browser - web server(cluster集群)) 
+        (极瘦客户端:最低限度地减少客户端程序，只需要browser(浏览器)) 
+        1.基于http协议(应用层) 
+        2.几乎所有的业务逻辑处理都在server完成
+        3.支持并发
+        4.client要求很少，只需要安装browser(浏览器) 
+        5.修改server之后，client不需要任何变化
+        6.server端开发技术：html/js,xhtml,... php,asp,jsp,servlet
+        缺点：所有业务都在服务器端完成，服务器负荷大。
+        优点：支持高并发访问；不需另外安装软件(只需浏览器)，免去更新的麻烦。
+
+2.开发一个静态的Web应用(*) 
+  1)下载一个tomcat服务器
+  2)web服务器-Tomcat的启动和配置(熟练使用和配置) 
+    先进入Tomcat主目录下的bin目录      // %catalina_home%/bin
+    window平台：启动---startup.bat
+               关闭---shutdown.bat
+    Linux平台：启动---startup.sh 或 catalina.sh run //catalina单次启动；startup启动直至shutdown
+              关闭---shutdown.sh 或 Ctrl+C
+    测试： 打开浏览器，访问 Tomcat 首页：http://localhost:8080 或者 http://127.0.0.1:8080/
+    获取进程Id强行杀死tomcat进程
+       ps ef|grep tomcat ---查看tomcat的进程id
+       kill -9 tomcat进程Id号 --- 强行杀死tomcat进程
+  3)介绍Web应用的结构
+      严格定义为两部分
+    ① Web应用的根目录下有一个特定的子目录称为WEB-INF，其中包含不能被客户访问的专用Web应用程序软件，
+       包括Servlet类文件、部署描述符web.xml、外部库以及其他任何由此应用程序使用的专用文件。
+    ② 所有位于WEB-INF之外的文件都被看作是公共的，它们可以从客户端被访问。资源包括HTML页面、JSP页面和图像等。
+    web.xml的模板(一个web.xml中可以配置多个Servlet)：
+
+        <?xml version="1.0" encoding="UTF-8"?>
+        <web-app version="2.5" 
+         xmlns="http://java.sun.com/xml/ns/javaee" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+         http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+          <servlet>
+            <servlet-name>servlet的名字1</servlet-name>   //servlet的逻辑名
+            <servlet-class>servlet类全名1</servlet-class> //类的完全限定名
+          </servlet>
+          <servlet>
+            <servlet-name>servlet的名字2</servlet-name>
+            <servlet-class>servlet类全名2</servlet-class>
+          </servlet>
+         
+          <servlet-mapping>
+            <servlet-name>servlet的名字1</servlet-name> //要和servlet标签中的相同
+            <url-pattern>指定servlet相对于应用目录的路径</url-pattern> //servlet的访问路径
+          </servlet-mapping>
+          <servlet-mapping>
+            <servlet-name>servlet的名字2</servlet-name>
+            <url-pattern>指定servlet相对于应用目录的路径</url-pattern>
+          </servlet-mapping>
+          <welcome-file-list>
+            <welcome-file>index.jsp</welcome-file>//指定默认的欢迎页面
+          </welcome-file-list>
+        </web-app>
+  4)注意事项
+
+
+3.介绍Web服务器的一些特点  
+    什么是静态内容？什么是动态内容？
+      静态：返回页面每个客户端都相同。  动态：各个客户端的页面各不相同。
+    产生动态内容的Web辅助应用：CGI & Servlet
+      CGI(Common Gateway Interface): 可以产生动态内容，跨语言(C/C++, Perl, python...) 
+          1.本身是一个进程(数据共享，跨进程调用) --性能较差
+          2.可移植性很差(本地语言) 
+          3.安全性差--可以访问本地的操作系统，容易受黑客攻击
+      web server / servlet container
+          1.性能好 --多线程(而不是进程) 
+          2.可移植性 --相对好
+          3.安全性
+
+4.Http基础(**) 
+  HTTP(Hyper Text Transfer Protocol)是超文本传输协议的缩写，它用于传送 WWW 方式的数据。
+  HTTP 协议采用了请求/响应模型。基于 TCP/IP 之上的协议，在 Web 上广泛使用。无状态。
+  如果来自服务器的响应是 html 页面，那么 html 内容会嵌入到 Http 响应中。
+  Http 会话：是一个简单的请求-响应序列。
+  1)请求响应模型
+    请求的关键要素：1.http方法(要完成的动作) 2.要访问的页面(URL请求) 3.表单参数
+    响应的关键要素：1.状态码(请求是否成功) 2.内容类型(txt,img,html等) 3.返回内容(具体资源:html,图片等) 
+  2)URL的分析
+    URL(Uniform Resoure Locator)统一资源定位器。Web 上的每一个资源都有唯一的地址，采用的就是 url 格式
+  3)使用Http Monitor截获http的请求与响应信息
+    Http 请求方法包括：Get()方法;Post()方法; 其他方法：Head, Trace, Put, Delete, Connect 等
+    Get()方法： Http 最简单的方法，其最主要的任务：从服务器上获取资源
+    Post()方法：更强大的请求方法，不仅可以请求资源，还可以向服务器发送表单数据
+  4)分析http请求的信息
+    客户端向服务器发送一个请求，请求头包含：1.请求的方法； 2.URI； 3.协议版本； 4.以及包含请求修饰符；
+                                    5.客户信息和内容的类似于 MIME 的消息结构
+  5)分析http响应的信息
+    截获内容：
+        HTTP/1.1 200 OK      // HTTP/1.1 是web服务器使用的版本；200 是状态码；OK 是状态码的文本版本
+        ETag: W/"472-1198101802343"
+        Last-Modified: Wed, 19 Dec 2007 22:03:22 GMT
+        Content-Type: text/html  // MIME类型：告诉浏览器所要接收的是哪一类型的数据。以供浏览器显示。
+        Content-Length: 472
+        Date: Wed, 19 Dec 2007 22:05:44 GMT
+        Server: Apache-Coyote/1.1
+        //以上是Http响应的首部
+        //响应体中包含了Html以及其他要显示的内容
+        <html><head><title>User Login</title></head>
+        <body><center>……</center></body></html>
+    Http 响应状态码分析(具体代码含义参看 http 代码对照表)：
+        1xx:信息响应类，表示接收到请求并且继续处理
+        2xx:处理成功响应类，表示动作被成功接收、理解和接受
+        3xx:重定向响应类，为了完成指定的动作，必须接受进一步处理
+        4xx:客户端错误，客户请求包含语法错误或者是不能正确执行
+            如：404——无法找到，表示无法找到指定位置的资源。
+        5xx:服务端错误，服务器不能正确执行一个正确的请求
+
+
+二、Servlet基础
+1.介绍Servlet的基本概念(***) 
+    (Servlet、Servlet容器、Servlet vs. CGI)——————图示
+  1)它是由 java 编写的、服务端的小程序。相对而言，Applet和javaScript是客户端小程序。
+  2)基于Http协议的，运行在web服务器内的。Servlet和CGI都是运行在Web服务器上,用来生成Web页面。
+  3)没有 main 方法。是接受来自网络的请求(form表单，以及其他的请求)，并对不同请求作出不同的响应。
+  4)由容器管理和调用。这个web容器可以控制Servlet对象的生命周期，控制请求由Servlet对象处理。
+  5)Web 服务器的辅助应用，处理特定的用户请求，并返回响应。
+    web服务器，这里的服务器不是硬件概念，而是软件，常用的web服务器有 Tomcat，Jboss等
+    Tomcat是一个用java语言编写的web服务器，所以需要有相应的java运行环境，也就是JVM，还要配置tomcat的具体路径。
+  6)继承 java 的优点，与协议、平台无关
+
+2.开发第一个Servlet应用(**) 
+    Web应用的结构 
+    开发一个Servlet应用的步骤 
+    1)建立 Web 应用目录(注意细节:各目录的位置、名称与包含的内容) 
+    2)编写 Java 代码，如：HelloWorld.java
+      把生成的.class 文件放置到 WebRoot/WEB-INF/classes 目录下
+    3)编写配置文件：web.xml
+      放置到 WebRoot/WEB-INF/  目录下
+    4)把整个 web 应用放到 %catalina_home%/webapps  //放到 tomcat的 webapps目录下
+
+3.分析Servlet应用(***) 
+  1)Servlet的继承体系 
+    javax.servlet.Servlet接口 --> GenericServlet抽象类 --> HttpServlet  -->  自定义类
+    所有的servlet都必须实现该接口    处理各种协议(包括http)   专职处理http协议  也可继承GenericServlet
+  2)Servlet接口；GenericServlet抽象类；HttpServlet类
+    Servlet接口(位置：javax.servlet.Servlet) 定义了特定的生命周期方法：
+        init(ServletConfig config) 
+        service(HttpServletRequest request, HttpServletResponse response) 
+        destroy() 
+    GenericServlet implements Servlet
+        实现了 init(ServletConfig config)、destroy()等方法；并提供了 init()方法。
+        还实现了 ServletConfig 接口。由于这是抽象类，所以必须实现抽象方法：service() 
+    HttpServlet extends GenericServlet   (位置：javax.servlet.http.HttpServlet) 
+        具有父类 GenericServlet 类似的方法和对象，是使用 Servlet 编程常用的类
+        支持 HTTP 的 post 和 get 等方法。
+  3)容器如何找到指定的Servlet？(图示) 
+    Servlet有 3 个"名字"： url 名、 应用中的逻辑名、 实际的名字
+    配置文件 web.xml 都把这几个名字一一对应起来了
+  Servlet是受容器管理的
+    request对象、response对象都是容器根据客户端请求而产生的。
+    容器根据url请求，通过DD(web.xml)配置(url名，内部逻辑名，完全限定名)定位具体的servlet。
+    容器根据客户请求创建/分配一个线程，并调用servlet的service()方法，把request对象、respone对象作为参数传过去
+    service()方法会根据客户端请求的Http方法调用不同的HttpServlet的方法(doGet(),doPost(),...);
+    Servlet使用response对象把处理完的结果响应到客户端。
+    service()方法结束后，线程要么撤销，要么返回容器的线程池；request对象、response对象都被gc回收。
+
+4.使用Servlet来发送用户输入的信息 
+  1)开发用户登录的应用
+  2)如何使用Form表单来提交数据
+     <form action="login" method="POST" enctype="multipart/form-data">
+     (1)action: 表单提交给服务器的哪个资源处理
+       "login" 为在 web.xml 中配置的 url-pattern 或者是 jsp、html 文件等。
+     (2)Get vs. Post方法的比较(使用Http Monitor) 
+       GET---->通过 URL 提交表单信息，由于受到 URL 长度的限制,只能传递大约 1024(1K)字节。
+          通过 http monitor 工具截获请求信息(下面仅写出请求行，请求首部略)：
+          GET /welcome/login.html?username=zhangsan&password=lisi HTTP/1.1 
+          //GET是请求方式； /welcome/login.html是请求路径； ?号后面是参数列表，以&分隔； 最后是协议版本
+       POST--->通过 Http Body 提交表单信息，传输的数据量大，可以达到 2M。
+          由请求行、请求首部、消息体 三部分组成。
+          参数放在消息体中，长度不再受限，更安全；而 GET 必须把参数放在请求行。
+          通过 http monitor 工具截获请求信息(大略)：
+          POST /welcome/login.html HTTP/1.1     //请求行
+          Accept: ...
+          Accept-Language: zh-cn,en-us;q=0.5
+          .....
+          Host: 127.0.0.1
+          .....                                 //从请求行以下到这行，都是请求首部
+          username=zhangsan&password=zhangsan   //消息体(有效负载) 
+       enctype: multipart/form-data ：在form中设置此属性后，传输的就是二进制数据，常可用于上传文件
+
+5.如何在服务器端获得表单提供的数据
+  1)HttpServletRequest 对象
+    由 Web Container 封装了用户的 Http 请求数据包而生成，可通过它获得所有跟用户请求数据报相关的信息。
+    getProtocol():String                     ——返回对应的协议       (如：HTTP/1.1) 
+    getMethod():String                       ——返回 http 对应的方法 (Get|Post) 
+    getRemoteHost():String                   ——返回远程主机名       (如：127.0.0.1) 
+    getRemotePort():int                      ——返回远程端口号       (如：55013) 
+    getHeader(String config):String          ——返回http对应的首部信息(参数如Accept-Language) 
+    getParameter(String name):String         ——返回指定参数(name)的值(value)   (如：zhangsan) 
+    getParameterValues(String name):String[] ——返回指定输入参数(名为 name)的所有值(输入的参数列表) 
+    getParameterNames():Enumeration          ——返回请求对象中全部输入参数的名称
+                                               (如：java.util.Hashtable$Enumerator@1ff395a) 
+  2)解决 Servlet 的中文乱码问题
+    (1)响应输出静态页面时，处理中文信息乱码： response.setContentType("text/html; charset=utf-8");
+    (2)获取数据过程中，处理中文输入乱码(3 种方法):
+       方法一：设置字符编码来解决 post 方法提交表单中文乱码问题。
+             request.setCharacterEncoding("gbk"); 
+             response.setContentType("text/html;charset=utf-8");
+             必须在第一个 request.getParameter("name"); 之前执行上面的语句。
+       方法二：重新生成指定编码的字符串
+             String name = new String(request.getParamete("name").getBytes("iso-8859-1"));
+       方法三：修改服务器的编码设置——解决 get 方法提交表单中文乱码问题
+             例如：Tomcat，通过修改%TOMCAT%/conf/server.xml
+             加入 URIEncoding="utf-8"
+    (3)静态 html 页面的中文化问题
+       <head>
+            <meta http-equiv="content-type" content="text/html; charset=gbk">
+       </head>
+
+6.请求路径
+  请求路径是把请求导向到一个 servlet 来响应服务。它是由几个重要的部分来组成的。
+  通过 HttpRequest 对象，暴露了如下信息(对照应用的目录结构)：
+  1)上下文路径(Context Path) 
+    该路径的前缀是和 ServletContext 相关的。
+    如果 Context 就是 Web 服务器的 URL 命名空间的缺省的根上下文时，那么上下文路径将会是一个空的字符串。
+    如果上下文并不是服务器的命名空间的根，则上下文路径就以“/”开始，但不能以“/”结束。
+  2)Servlet 路径(Servlet Path) 
+    该路径就是直接与激活该请求的相应映射，它也是以“/”开头。
+    但要注意的是，如果指定的请求是与“/＊”模式相匹配，则此时 Servlet 路径就是一个空字符串。
+  3)路径信息(PathInfo) 
+    请求路径中除了上下文路径和 Servlet 路径以外的部分。
+    当没有额外的路径时路径信息就是空的(null)，或者它会以“/”开始的字符串。
+  在 HttpServletRequest 接口中定义如下的方法来访问请求路径的相应信息：
+    getContextPath();
+    getServletPath();
+    getPathInfo();
+    值得注意的是，请求 URI 和路径的各部分之间的 URL 编码的不同之外，下面的等式恒成立：
+    requestURI = contextPath + servletPath + pathInfo
+
+
+
+
+
+
+
+
+Day2
+1.配置开发环境
+  如何利用IDE开发(构建)一个web project
+  部署web project到Tomcat
+    ————结果是把WebRoot下的内容打成包，发布到webapps中
+2.在集成环境开发过程中的注意事项
+  如果修改了Java文件(修改了方法签名除外)，无需重启，也无需重部署
+  如果修改了html文件，无需重启，但需要重部署
+  修改了web.xml，系统会自动重部署
+
+3.Servlet的生命周期
+  生命周期有哪几个过程(4个)?
+  每个过程都对应有特殊的生命周期方法
+    装载&实例化————构造方法
+    初始化————————init()       只调用一次，并且在service()之前完成
+    处理请求———————service()   处理客户的请求，每个请求都在单独的线程中完成，可多次调用
+    销毁——————————destroy()   只调用一次，通常在停止WEB应用或者是Web应用重启时
+
+  1)实例化(两种时机)：
+    A.配置了<load-on-startup>元素，启动应用时实例化
+      其中，配置数值建议从1开始计数，值越小，载入的优先级越高。
+      优先级提倡从1开始，1以下的数字，有些容器不理会。负数则被认为是“默认”。
+    B.如果没有配置，则在第一次请求时才实例化
+  2)初始化——init()/init(ServletConfig config) 
+    实例化之后，容器马上调用init()方法来初始化。
+    对 Servlet 将要使用的资源作初始化,如读入配置文件信息等(只执行一次)。
+    在初始化过程中，容器会创建 ServletConfig 对象并把它作为 init 方法的参数传入。
+    该配置对象允许 servlet 从访问 Web 应用的配置信息中读取出初始化参数的名-值对。
+    Servlet 提供2个初始化方法：  init()  和  init(ServletConfig config) 。
+  3)请求处理——service() 
+    初始化后，容器会调用 servlet 的 service()方法，向客户端提供服务
+    service()能够被多客户端多次调用(每个请求都要执行一次) 
+  4)销毁——destroy() 
+    在Web Container停止 Web App 或 WebApp 被停止/reload 时调用此方法。
+
+4.ServletConfig & ServletContext
+  1)ServletConfig
+    servlet访问配置数据的一个对象，由容器创建，每个servlet独享
+    仅对本 servlet 有效，一个 servlet 的 ServletConfig 对象不能被另一个 servlet 访问。
+    主要用来读取 web.xml 中配置的Servlet初始信息，不能被其它 Servlet 共享。还可以用于访问 ServletContext。
+  2)ServletContext
+    ServletContext 是多个 Servlet 共享数据的对象。
+    对同一个 Web 应用中的任何 servlet，在任何时间都有效。
+    对应整个 Web Application 运行环境，可以用来读取 web.xml 中配置的应用初始信息，写日志，共享数据等
+    ServletContext 被所有 Servlet 共享。可以理解为真正意义上的全局对象
+  3)如何获取ServletConfig
+    A.init(ServletConfig config){.....} 
+      容器在Servlet初始化之前已经创建了ServletConfig
+      但如果Override此方法，需要记得调用：super.init(config);//其实是调用GenericServlet的init(config) 
+      //这里的config只是方法内部的变量。如果其它方法中需调用，还得：this.config=config;给成员变量的config赋值
+    B.其他地方(包括在init()方法中)，可以使用Servlet API本身的方法
+      this.getServletConfig();  //任何方法中都可以调用，包括init(ServletConfig config)方法
+    注：这也是为什么把这个知识点放在这里的原因
+  4)如何获取ServletContext
+    A.config.getServletContext();//前提是config在之前已获取
+    B.Servlet API提供了  this.getServletContext();//没有config也可以用
+  5)注意：不能在Servlet中使用this.getServletConfig或者this.getServletContext()来初始化成员变量
+    因为创建成员变量优先于构造方法和init方法；而 config 和 context 只有调用了 init 方法之后才初始化
+  6)利用ServletContext.log()来写日志
+    如：this.log("String"+(new Date()));
+  7)例子
+    使用ServletContext来获取<context-param>参数
+    使用SerlvetConfig来获取Servlet的<init-param>
+
+5.产生动态内容的另一个方面：根据业务逻辑进行请求传递(页面跳转) 
+  RequestDispatcher(请求分发器)
+    ————forward(request, response)//跳转到其他资源
+    ————include(request, response)//包含其他资源
+  如何获取RequestDispatcher
+    request.getRequestDispatcher(page)
+    servletcontext.getRequestDispatcher(page);
+    两者之间的区别？(后面会详细讲述)
+6.网上书店(打折优惠) 
+  SerlvetConfig来获取Servlet的<init-param>
+  ServletContext来获取<context-param>参数
+  RequestDispatcher进行页面包含
+
+
+
+
+
+
+
+
+Day3——————访问资源，Servlet如何与数据库构建应用系统
+1.两种访问DB的方法
+  1)直接连接DB，通过JDBC API
+  2)配置Tomcat的连接池
+    server.xml配置<Resource>
+    web.xml：应用引用资源
+    init()：通过JNDI API来获取DB Connection
+  2种方法都需要在Servlet的init()方法中，把DB Connection注入到Servlet中
+
+2、用Tomcat的jndi服务获取数据源
+    第一步：为 Tomcat 配置连接池：
+        修改tomcat/conf/server.xml
+        在<host>节点中加入 Resource 配置
+        <Context path="/usermanager">            //Web应用的根 
+        <Resource 
+        name="jdbc/tarena"                       //JNDI名字，用于查找 
+        type="javax.sql.DataSource"              //资源类型 
+        username="root"
+        password="11111111" 
+        driverClassName="com.mysql.jdbc.Driver"  //JDBC驱动 
+        maxIdle="10"                             //最大空闲连接数
+        maxWait="5000"                           //等待时间,配置为-1就是无限等待,直到有空闲连接为止
+        url="jdbc:mysql://localhost/tarena"      //连接的 URL 
+        maxActive="10"/>
+        </Context>
+    第二步：在应用中配置资源引用 (此步骤可以省略)
+        修改web.xml
+        <resource-ref> 
+        <res-ref-name>jdbc/tarena</res-ref-name>    //资源引用名 
+        <res-type>javax.sql.DataSource</res-type>   //资源的类型 
+        <res-auth>Container</res-auth>               //Application 
+        <res-sharing-scope>Shareable</res-sharing-scope> //Unshareable 
+        </resource-ref>
+     第三步：在 Servlet 的 init 方法中通过 JNDI 接口来获取 DataSource
+        Context ctx=new InitialContext(); 
+        DataSource ds=(DataSource)ctx.lookup("java:comp/env/jdbc/tarena"); 
+        Connection con=ds.getConnection();
+
+3.如何构建一个Web应用系统(Servlet + JDBC + DB) 
+  分层设计的思想：表示层(view) + Dao层
+  Servlet层的设计：
+    废弃“为每个请求提供一个Servlet”的做法，引入Action接口与参数控制
+  Dao模式
+  工厂模式:DaoFactory
+
+
+
+
+
+
+
+
+
+day4 会话管理
+     Cookie机制  Session机制
+   HTTP协议与状态保持：Http是一个无状态协议
+
+1. 实现状态保持的方案：
+   1)修改Http协议，使得它支持状态保持(难做到) 
+   2)Cookies：通过客户端来保持状态信息
+     Cookie是服务器发给客户端的特殊信息
+     cookie是以文本的方式保存在客户端，每次请求时都带上它
+   3)Session：通过服务器端来保持状态信息
+     Session是服务器和客户端之间的一系列的交互动作
+     服务器为每个客户端开辟内存空间，从而保持状态信息
+     由于需要客户端也要持有一个标识(id)，因此，也要求服务器端和客户端传输该标识，
+     标识(id)可以借助Cookie机制或者其他的途径来保存
+2. COOKIE机制
+   1)Cookie的基本特点
+     Cookie保存在客户端
+     只能保存字符串对象，不能保存对象类型
+     需要客户端浏览器的支持：客户端可以不支持，浏览器用户可能会禁用Cookie
+   2)采用Cookie需要解决的问题
+     Cookie的创建
+       通常是在服务器端创建的(当然也可以通过javascript来创建) 
+       服务器通过在http的响应头加上特殊的指示，那么浏览器在读取这个指示后就会生成相应的cookie了
+     Cookie存放的内容
+       业务信息("key","value") 
+       过期时间
+       域和路径
+     浏览器是如何通过Cookie和服务器通信？
+       通过请求与响应，cookie在服务器和客户端之间传递
+       每次请求和响应都把cookie信息加载到响应头中；依靠cookie的key传递。
+3. COOKIE编程
+   1)Cookie类
+     Servlet API封装了一个类：javax.servlet.http.Cookie，封装了对Cookie的操作，包括：
+     public Cookie(String name, String value)  //构造方法，用来创建一个Cookie
+     HttpServletRequest.getCookies()           //从Http请求中可以获取Cookies
+     HttpServletResponse.addCookie(Cookie)     //往Http响应添加Cookie
+     public int getMaxAge()                    //获取Cookie的过期时间值
+     public void setMaxAge(int expiry)         //设置Cookie的过期时间值
+   2)Cookie的创建
+     Cookie是一个名值对(key=value)，而且不管是key还是value都是字符串
+        如： Cookie visit = new Cookie("visit", "1");
+   3)Cookie的类型——过期时间
+     会话Cookie
+        Cookie.setMaxAge(-1);//负整数
+        保存在浏览器的内存中，也就是说关闭了浏览器，cookie就会丢失
+     普通cookie
+        Cookie.setMaxAge(60);//正整数，单位是秒
+        表示浏览器在1分钟内不继续访问服务器，Cookie就会被过时失效并销毁(通常保存在文件中) 
+     注意：
+        cookie.setMaxAge(0);//等价于不支持Cookie；
+
+4. SESSION机制
+   每次客户端发送请求，服务断都检查是否含有sessionId。
+   如果有，则根据sessionId检索出session并处理；如果没有，则创建一个session，并绑定一个不重复的sessionId。
+   1)基本特点
+     状态信息保存在服务器端。这意味着安全性更高
+     通过类似与Hashtable的数据结构来保存
+     能支持任何类型的对象(session中可含有多个对象) 
+   2)保存会话id的技术(1) 
+     Cookie
+        这是默认的方式，在客户端与服务器端传递JSeesionId
+        缺点：客户端可能禁用Cookie
+     表单隐藏字段
+        在被传递回客户端之前，在 form 里面加入一个hidden域，设置JSeesionId：
+        <input type=hidden name=jsessionid value="3948E432F90932A549D34532EE2394" />
+     URL重写
+        直接在URL后附加上session id的信息
+        HttpServletResponse对象中，提供了如下的方法：
+         encodeURL(url); //url为相对路径
+5. SESSION编程
+   1)HttpSession接口
+     Servlet API定义了接口：javax.servlet.http.HttpSession， Servlet容器必须实现它，用以跟踪状态。
+     当浏览器与Servlet容器建立一个http会话时，容器就会通过此接口自动产生一个HttpSession对象
+   2)获取Session
+     HttpServletRequest对象获取session，返回HttpSession：
+       request.getSession();        //表示如果session对象不存在，就创建一个新的会话
+       request.getSession(true);    //等价于上面这句；如果session对象不存在，就创建一个新的会话
+       request.getSession(false);   //表示如果session对象不存在就返回 null，不会创建新的会话对象
+   3)Session存取信息
+     session.setAttribute(String name,Object o)  //往session中保存信息
+     Object session.getAttribute(String name)    //从session对象中根据名字获取信息
+   4)设置Session的有效时间
+     public void setMaxInactiveInterval(int interval)
+        设置最大非活动时间间隔，单位秒；
+        如果参数interval是负值，表示永不过时。零则是不支持session。
+     通过配置web.xml来设置会话超时，单位是分钟
+        <seesion-config>
+             <session-timeout>1</session-timeout>
+        </session-config>
+     允许两种方式并存，但前者优先级更高
+   5)其他常用的API
+     HttpSession.invalidate()     //手工销毁Session
+     boolean HttpSession.isNew()  //判断Session是否新建
+         如果是true，表示服务器已经创建了该session，但客户端还没有加入(还没有建立会话的握手) 
+     HttpSession.getId()          //获取session的id
+
+6. 两种状态跟踪机制的比较
+       Cookie                        Session 
+    保持在客户端                     保存在服务器端
+    只能保持字符串对象                支持各种类型对象
+    通过过期时间值区分Cookie的类型     需要sessionid来维护与客户端的通信
+       会话Cookie——负数                Cookie(默认) 
+       普通Cookie——正数                表单隐藏字段
+       不支持Cookie——0                 url重写
+
+
+7. RequestDispatcher.forward(req, resp);    vs.   HttpServletResponse.sendRedirect("url");
+   请求分发器 rd.forward(req, resp); 只能访问内部资源。浏览器地址不变。针对同一个请求。
+      可获取表单传递过来的信息req.getParameter("name");
+      应用内部数据共享的方式  req.getAttribute("name");
+   重定向 resp.sendRedirect("url"); 可以跨网站访问资源。浏览器地址会改变。变成另外的一个请求。
+
+8. 相对路径 与 绝对路径
+   1)形式：
+     绝对路径：以/开头的路径
+     相对路径：不是以/开头的路径
+   2)绝对路径：
+     运行在客户端时：请求的参考点是站点(站台)本身；即是 http://localhost:8080/
+        如： <form action="/WebTest/login" ...> ...
+            路径等于 http://localhost:8080/WebTest/login
+     运行在服务器时：请求相对于应用的根 http://localhost:8080/工程/
+        web.xml, servlet, jsp... 这些都是运行在服务器端
+        如：RequestDispatcher rd = request.getRequestDispatcher(url); //相对路径，也可以绝对路径
+           RequestDispatcher rd = servletcontext.getRequestDispatcher(url); //只能绝对路径
+   3)相对路径：
+     运行在客户端时：请求的参考点是应用的当前路径；即是页面所在的目录 http://localhost:8080/工程/页面所在目录/
+        主要用在两处：
+        一是表单中的 action="..."  如： <form action="login" ...> ...
+            路径等于 http://localhost:8080/工程/页面当前目录/login
+        二是在重定向中用 resp.SendRedirect("logon/er.html");
+            路径等于 http://localhost:8080/工程/页面当前目录/logon/er.html
+	 运行在服务器时：都是相对于应用的当前路径；可认为是直接在当前url后面加上相对路径
+	    如： rd.forward("target");
+
+9. 范围对象   context > session > request > config
+   对比HttpSession、HttpServletRequest、ServletContext、ServletConfig的作用范围
+   1)ServletConfig：在一个Servlet实例化后，就创建了一个ServletConfig对象。
+     主要用来读取web.xml中配置的Servlet初始信息，不能被其他Servlet共享。
+     作用范围：处于同一个Servlet中，均起作用。
+   2)HttpServletRequest：这是由Web容器对客户Http请求数据封装而成的对象，可通过它获得所有跟客户请求相关的信息。
+     比如Http请求方法(Get or Post)。 注意：request是可以跨Servlet的。
+     作用范围：只要处于同一个请求中，均起作用。
+   3)HttpSession： 当浏览器与Servlet容器建立一个Http会话时，容器就会通过此接口自动产生一个HttpSession对象。
+     作用范围：处于同一个会话中，均起作用。(用JsessionId标识同一个会话) 
+   4)ServletContext：对同一个Web应用中的任何Servlet，在任何时候都有效，是一个全局的对象。
+     作用范围：处于同一个Web应用中，均起作用。(不同的session和请求都可用)     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Day5 
+一、 过滤器 Filter
+1. why Filter?
+   针对通用WEB服务、功能，透明的处理
+
+2. 什么是 Servlet Filter?
+     过滤是 Servlet 2.3 版才引入的新特性。过滤器可以认为是实现 Http 请求、响应以及头信息等内容的传送的代码片断。
+     过滤器并不能创建响应，但它可以“过滤”传给 servlet 的请求，还可以“过滤”从 servlet发送到客户端的响应；
+     它不仅能处理静态内容，还可以处理动态内容。换而言之，filter 其实是一个“servlet chaining”(servlet 链)。
+   一个 filter 包括:
+    1) 在 servlet 被调用之前截获;
+    2) 在 servlet 被调用之前检查 servlet request;
+    3) 根据需要修改 request 头和 request 数据;
+    4) 根据需要修改 response 头和 response 数据;
+    5) 在 servlet 被调用之后截获.
+
+3. 过滤器的生命周期
+   Filter 组件的生命周期与 Servlet 的类似。
+   过滤器有四个阶段(与servlet类似)：
+    1) 实例化;
+    2) 初始化(调用init()方法);
+    3) 过滤(调用doFilter()方法);
+    4) 销毁(调用destroy()方法);
+
+4. Filter编程
+   1)定义Filter(implements Filter) 
+   2)配置Filter
+     配置对哪些资源进行过滤(url) 
+
+     <filter>
+        <filter-name>Logger</filter-name>                   //过滤器名
+        <filter-class>com.LoggerFilter</filter-class>       //具体过滤器类
+        <init-param>                                        //初始化参数
+           <param-name>xsltfile</param-name>
+           <param-value>/xsl/stockquotes.xsl</param-value>
+        </init-param>
+     </filter>
+     <filter-mapping>                 
+         <filter-name>Logger</filter-name>
+         <url-pattern>/＊</url-pattern> //将过滤器应用于Web应用中的每个Web资源；可以只指定某个资源
+     </filter-mapping>
+
+5. FilterChain
+   1) chain是如何配置，顺序
+      当同一个应用中配置了多个 filter 时，其执行顺序是如何的呢？
+      答：按 web.xml 中<filter-mapping>的顺序来执行的
+   2) chain.doFilter(req, resp) 
+      调用下一个Filter，到最后一个Filter则正式调用 TargetServlet
+   3) 调用过程(类似于递归调用) 
+
+6. Filter的类型
+   Filter 有4种类型，主要体现在<filter-mapping>中的<dispatcher>属性：
+   <dispatcher>REQUEST</dispatcher>       默认,客户端的直接的请求，才触发该过滤器
+   <dispatcher>FORWARD</dispatcher>       servlet 调用 rd.forward(req,resp)时触发
+   <dispatcher>INCLUDE</dispatcher>       servlet 调用 rd.include(req,resp)时触发
+   <dispatcher>ERROR</dispatcher>         发生错误，跳转到错误页面时触发
+
+二、监听器 Listener
+    Listener 是 Servlet 的监听器，它可以监听客户端的请求、服务端的操作等。通过监听器，可以自动激发一些操作。
+    如：监听在线的用户数量。当增加一个session时，就激发sessionCreated(HttpSessionEvent se)，给在线人数加1
+1. 监听器的种类
+   一共分三大类型，有 8 种 listener：
+    a.监听 servlet context
+      1)生命周期事件
+        接口： javax.servlet.ServletContextListener
+        内容： servlet 上下文已经被创建，并且可以用来向其第一个请求提供服务，或者 servlet 上下文即将关闭
+      2)属性的改变
+        接口： javax.servlet.ServletContextAttributeListener
+        内容： 在 servlet 上下文中，增加、删除或者替换属性
+    b.监听 servlet session
+      1)生命周期事件
+        接口： javax.servlet.http.HttpSessionListener
+        内容： 对一个 HttpSession 对象进行创建、失效处理或者超时处理
+      2)属性改变
+        接口： javax.servlet.http.HttpSessionAttributeListener
+        内容： 在 servlet 会话中，增加、删除或者替换属性
+      3)会话迁移
+        接口： javax.servlet.http.HttpSessionActivationListener
+        内容： HttpSession 被激活或者钝化
+      4)对象绑定
+        接口： javax.servlet.http.HttpSessionBindingListener
+        内容： 对 HttpSession 中的对象进行绑定或者解除绑定
+    c.监听 servlet request
+      1)生命周期
+        接口： javax.servlet.ServletRequestListener
+        内容： 一个 servlet 请求开始由 web 组件处理
+      2)属性改变
+        接口： javax.servlet.ServletRequestAttributeListener
+        内容： 在 ServletRequest 中，增加、删除或者替换属性
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   Servlet环境配置
+JAVA_HOME=/XXX/XXX/(JDK路径，bin的上一层目录)
+CATALINA_HOME=/XXXX/XXX(tomcat的绝对路径 windows中 X:\xxx\xxx)
+
+            Tomcat使用
+在启动Tomcat时，是运行Tomcat的bin目录下的startup.sh(windows中使用startup.bat)
+Linux中要显示后台的具体信息，则用catalina.sh run 代替startup.sh命令。
+判断Tomcat是否启动成功，可以在浏览器的地址栏中使用 http://localhost:8080/ 或 http://127.0.0.1:8080/ 可以访问到tomcat的主页就表示启动成功。
+要想停止tomcat服务器，可使用shutdown.sh(windows中使用shutdown.bat)，如果直接关闭启动窗口，就会造成8080端口占用错误，这时可以再使用shutdown.sh关闭一下服务器。
+
+        Servlet开发步骤
+编写servlet源代码，注意servlet的结构。
+编译servlet,需要servlet-api.jar文件(位于$Tomcat\common\lib\目录下；加入classpath环境变量中) 
+部署servlet
+   编写配置文件web.xml：其中包括servlet burl与 servlet name的映射，
+   以及servlet name 与  servlet class name的映射。
+构造web应用程序目录结构如下：
+ └─MyWebApp           应用程序名
+   └─WEB-INF
+       └─classes
+       └─lib
+   └─*.html/＊.jsp
+配置文件web.xml放在WEB-INF目录下
+servlet类文件放在classes目录下
+将整个应用程序目录拷贝到  $Tomcat\webapps\  目录下
+
+ 使用此结构的优点
+一个Web容器中可以共存多个Web应用程序。
+Web容器知道该到何处寻找装入Web应用程序所需的类。
+
+
+                  web.xml文件的写法
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation=http://java.sun.com/xml/ns/j2ee
+   http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd version="2.4">
+  <servlet>
+<servlet-name>IpLogServlet</servlet-name>
+<servlet-class>tarena.servlet.lc.IpLogServlet</servlet-class>
+   <init-param>
+ <param-name>filename</param-name>        //getServletConfig().getInitParameter();
+ <param-value>c:/iplog.txt</param-value>  
+   </init-param>
+   <load-on-startup>2</ load-on-startup > //启动服务器时就创建该servlet实例，必须是正数，小的数先加载
+  </servlet>
+  <servlet-mapping>
+<servlet-name>IpLogServlet</servlet-name> //要和servlet标签中的相同
+<url-pattern>/lc/iplog</url-pattern> //指定servlet相对于应用目录的虚拟路径
+  </servlet-mapping>                       /xxx/xxx(绝对路径),xxx(相对路径) 
+</web-app>
+
+绝对路径开头的“/”代表 http://localhost:8080/
+
+             测试应用
+在tomcat服务器中，访问应用下的资源可以在端口号后加上web应用文件夹的名字，就可以看到资源
+http://localhost:8080/应用文件夹名/url-pattern
+静态页面只能放在web应用的文件夹下，不能够放在WEB-INF文件夹下，WEB-INF文件夹中的资源是受保护的，不能够通过网络访问到。
+
+       Servlet的调用过程
+用户通过浏览器向web服务器发送请求
+http://serverip:port/appname
+服务器为用户定位资源
+   静态资源：/a.html /a/b.html (这里的路径是针对web应用文件夹目录)读文件并把内容发送到客户端。
+   动态资源：解析web.xml定位Servlet类的名字。
+装载类(WEB-INF/classes | WEB-INF/lib/＊.jar) 
+创建该对象的实例
+Servlet ser=(Servlet)(Class.forName("servle的类名")).newInstance();
+//我们写的Servlet一定要实现Servlet接口或者继承实现了Servlet接口的类
+ser.service(request,response);
+
+     用Servlet处理表单数据
+FORM元素的属性
+  action: 用来指定要处理FORM数据的Servlet的URL
+  method: 指定数据传送给HTTP服务器的方法
+解析请求
+  getParameterNames:可以获得一个迭代器Enumeration，通过这个迭代器，来获得form表单中参数的名字。
+  getParameter: 返回表单中参数名(区分大小写)对应的值(没有这样的参数，返回null; 没有任何值，返回空String);多参数同名时，只取一个。
+  getParametervalues: 返回表单中参数名(区分大小写)对应的字符串数组(没有这样的参数，返回null;只有一个值，返回值为单一元素组);
+
+            get & post
+在浏览器的地址栏操作按回车键，或者是热连接，都是get请求，form的method属性如果不指定，默认为get请求(传的数据不能太大，且表现为明文)。
+get请求，会将参数显示在浏览器的地址栏上，其显示格式，在地址之后会以?开始，以'&'分隔参数，可以通过HttpServletRequest对象的getQueryString()方法来获得get请求的参数值。
+post请求：ServletRequest对象的getInputStream()方法可以获得一个由Socket得来的输入流，可以使用这个流来实现文件的上传。getReader()方法可以直接获取post请求的参数。
+
+     Servlet的生命周期
+创建Servlet对象，通过服务器反射机制创建Servlet实例，默认第一次请求时才会创建。
+调用Servlet对象的init()方法，初始化Servlet的信息，init()方法只会在创建后被调用一次。
+响应请求，调用service()或者是doGet()，doPost()方法来处理请求，这些方法是运行的在多线程状态下的。
+在长时间没有被调用或者是服务器关闭时，会调用destroy()方法来销毁Servlet对象。
+
+Servlet对客户端提供服务的时序图(插图见Servlet_Note.pdf，P16) 
+Servlet生命周期状态图(插图见Servlet_Note.pdf，P17) 
+
+      init方法
+当首次创建Servlet时就会调用init方法, 而不是每个用户请求都会调用该方法。
+我们可以在init方法中完成类似于构造方法的初始化功能。
+init方法一结束，servlet即可接受客户端请求;
+
+           init方法实例
+覆盖init(ServletConfig conf)方法时，应该总是在首行调用super.init();或者直接覆盖init();
+init方法接受ServletConfig作为参数, 用以下方法获得参数值：
+getInitParameter: 返回指定参数名称对应的值，如果参数不存在，返回null;
+getInitParameterNames: 返回所有初始化参数的名字 ;
+
+       service方法
+每当服务器接收到对Servlet的请求时，服务器就会产生一个新线程, 并调用service。
+service方法检查HTTP请求类型，并相应地调用doGet、doPost、doPut、doDelete。
+被container调用去响应(ServletResponse)来自客户端的请求(ServletRequest);
+
+   Servlets的多线程安全
+多线程占用资源少，处理速度快，提高了效率。
+一些编码建议：
+ 对变量和方法定义适当的访问方式, 例如单纯取值操作不会有多线程安全问题;
+ 同步化所有访问重要数据的实例变量; 多线程下，如果操作的是一个变量，且兼有读写操作，
+ 就要考虑加上同步，但同步不能乱加，否则会造成死锁问题。
+
+         并发需要注意的
+并发的环境：资源处于一个并发的环境
+共享资源：多个线程共享一个临界资源
+全面同步：如有n个变量访问同一个资源，这n个变量都得同步。即多个锁一把钥匙，钥匙放在一个共享区域内
+sychronized(this)：粗粒度的锁。是将所有的路都加锁；
+sychronized(object o1)：细粒度的锁。只对对象中的变量加锁。效率较前面的高，但是较难控制。
+读写需要互斥。
+sychronized(this):this不能是基本数据类型，必须是Object.不锁对象的引用，而是对象的内存空间。
+servlet中需要同步的：成员变量、文件、静态变量、数据库连接
+
+      destroy方法
+服务器决定删除已经加载的Servlet实例之前将调用Servlet的destroy方法;
+该方法允许Servlet:
+ 关闭数据库连接;
+ 中止后台线程;
+ 将Cookie程序清单或访问计数写到磁盘以及执行其他类似的收尾工作。
+在Servlet终止时处理Service线程
+在destroy()方法中：如有服务(通过一个同步化的实例方法取得当前线程数大于0)，则置关闭状态为false(通过一个同步化的实例方法实现)。然后循环等待服务线程数为0，则置关闭状态为true.
+在Service()方法中: 如见关闭状态为true，便不执行具体逻辑方法，直接退出。
+
+HTTP servlet类的基本结构
+继承HttpServlet
+实现至少一个service方法，如：doGet(...)和doPost(...)
+service方法有两个参数，HttpServletRequest 和HttpServletResponse:
+HttpServletRequest代表经过容器加工的用户的请求
+HttpServletResponse代表需要容器进一步加工的对用户的响应
+我们写的servlet需要引入javax.servlet.* 和javax.servlet.http.* 两个命名空间
+
+        servlet继承关系
+servlet主要数据结构：
+  Servlet 接口：主要定义了servlet的生命周期方法
+  ServletConfig接口：为servlet提供了使用容器服务的若干重要对象和方法。
+  ServletContext接口：是Servlet的上下文对象，这个对象是在服务器启动时创建的，为servlet提供了使用容器服务的若干重要方法。
+  GenericServlet抽象类：为servlet提供了一般的实现(包括实现了servlet和ServletConfig两个接口)，保存了容器通过init方法传递给servlet的一个ServletConfig类型的重要对象。
+  HttpServlet抽象类：为处理http请求的servlet提供了一般实现，主要是定义和实现了若干service方法。
+  继承关系：GenericServlet继承了Servlet和ServletConfig接口；HttpServlet继承了GenericServlet;
+  我们写的servlet继承了HttpServlet
+
+Servlet访问DB(一个servlet完成整个功能)
+ 获取client端信息 --->  entity -------v
+ 调用相应的处理方法 --->  controller    |
+ 连接数据库  --->  util   ------------v
+ 操作信息数据  --->  biz    ------->  model
+ 返回给client端相应的结果页面  --->  view
+                          
+ 将一个servlet按功能细分
+将一个完成所有功能的servlet分解成多个，
+分别完成自己的功能，即形成了mvc。
+
+ MVC框架 (组件的各司其职)
+Model，模型层(封装数据 )，这一层一般是进行数据库访问，并且封装对象，这一层中也存放在访问数据库取出信息封装成对象的类，也就是实体类的信息，可以使用JDBC或者Hibernate实现这一层的功能。
+Ctrl，控制层(改变数据，改变模型的状态 )，用来相应请求和调用写好的相应的访问数据库的方法，这一层是用来控制请求的响应的，现在我们是使用Servlet来实现这一层，不过一般是会用开源的MVC框架来实现这层，例如struts，或者是Spring的MVC框架。
+View，表现层(显示数据和收集数据)，收集数据的一般是form表单，不过要保证数据的正确性要是用JavaScript验证信息，以后我们会学到的JSP(java server page)就是用来表现、显示数据的。
+ Servlet之间的怎么互相调用在上述基础上需要解决servlet之间的调用：可以利用servletContext解决每一个servlet都可能和上下文交互，则每个servlet中都应该保存一个servletContext对象，去访问整个应用的上下文， 步骤如下：
+getServletContext()::application
+application.getRequestDispatcher(“/res/students/list”)::dis
+patcher dispatcher.forward(request,response)
+每个JVM中的每一个应用程序里都存在一个上下文
+servletContext在servletConfig的对象中;
+ServletContext.getRequestDispatcher(String path)：返回一个RequestDispatcher
+通过RequestDispatcher的forward()或include()方法传送请求。
+如何在一个servlet中调用另外一个
+              servlet:
+ServletContext类的getRequestDispatcher(Stringpath)方法获得一个RequestDispatcher对象，并且跳转到指定的Servlet，getRequestDispatcher(String path)方法中的参数就是path，就是指定跳转的Servlet的url-pattern。
+RequestDispatcher类的forward(ServletRequestrequest, ServletResponse response) 方法，可以把请求对象转发给其他的Servlet。
+
+   在多个servlet中传递信息：
+HttpServletRequest对象中的方法
+setAttribute(String name,Object o)，可以使用HttpServletRequest对象来携带信息，并且可以通过getAttribute(String name)方法来获得携带的信息，这两个方法类似于map中的存取方法，setAttribute方法给数据加上标识，getAttribute方法则是通过这个标识来获取数据，可以使用这一对方法的前提就是要保证是同一个请求对象(HttpServletRequest)
+
+       转发请求至新的资源
+request dispatcher的二种传送请求方式
+   Forward: 将请求从一个servlet传到服务器上的其他资源
+   (servlet、JSP、HTML);
+   Include: 将静态或动态内容包含在当前servlet中;
+获得request dispatcher的二种方式：
+   ServletRequest.getRequestDispatcher()     // 相对路径
+   ServletContext.getRequestDispatcher()     // 绝对路径
+Response.sendRedirect(/servapp/state/login); //要写绝对路径，产生新的请求，
+Forward(req,resp);//在当前路径基础上跳转
+   两个页面之间跳转的时侯如果需要数据传递，则只能用
+   forward();因为sendRedirect()会产生一个新的请求。
+servlet中使用数据源访问数据库
+在服务器中配置数据源(使用admin管理界面)
+再servlet中使用JNDI语法获取数据源
+Context context = new InitalContext();
+DataSource ds =(DataSource)
+context.lookup("java:comp/env/"+dsName);
+Connection con = ds.getConnection();
+新建一个配置文件myapp.xml(假设web应用程序名称为：myapp),将xml文件的头部和一对<Context>标签写入该文件，将server.xml中有关数据源配置的<Resource>标签内容拷贝到myapp.xml中的<context>标签之间。server.xml位于$tomcat\conf\文件夹下，myapp.xml放在$tomcat\conf\catalina\localhost\文件夹下。
+
+      数据源配置Server.xml
+<Resource
+   name="jdbc/oracle" 配置JDNI的名字
+   type="javax.sql.DataSource" 绑定资源的类型
+   password=“openlab"
+   driverClassName="oracle.jdbc.driver.OracleDriver" 驱动名
+   maxIdle=“1”最大空闲连接数
+   maxWait="-1"等待时间,配置为-1就是无限等待,直到有空闲连接为止
+   username=“open123"
+   url="jdbc:oracle:thin:@192.168.0.39:1521:TARENADB"
+   maxActive="3" 最大活动连接数/>
+     会话管理
+为什么要使用session?
+ 一般来讲，从同一客户打开浏览器连接到服务再到客户关闭浏览器可称为一次会话(中间浏览器可以打开多个窗口)
+ 通信协议分为有状态和无状态两种。Http协议是一种无状态协议。一个客户向服务器发出请求然后服务器返回响应，连接就被关闭了。在服务器端不保留连接的有关信息．因此当下一次连接建立时，服务器已没有以前连接的信息了，无法判断这一次连接和以前的连接是不是属于同一客户发出的。在实际应用中，客户进行一个事务性的操作可能需要对服务器进行好几次连接，这时维护前几次连接的状态就非常重要。
+ 服务器必须能够区分不同的客户，而且还要有为每一个客户存储数据的方法。
+
+session实现的三种方法
+Cookie
+URL Rewriting
+隐藏表单域
+使用java servlet API进行会话管理
+          (session)
+java servlet API 主要提供了两个与会话相关
+的类和接口：Cookie和HttpSession
+                 Cookie
+控制机制:
+⊕Browser---------request----- Web server
+⊕Web server---------request+info--------- Browser
+⊕Browser---------request+info-------- Web server(客户端
+带信息来再次访问其标志的资源)
+详细解释
+ Cookie是一小块可以嵌入到Http请求和相应中的数据。
+ 它在服务器端产生，并作为响应头域的一部分返回用户。浏览器收到包含Cookie的响应后，会把Cookie的内容用key-value对的形式写入到一个客户端专门存放Cookie的文本文件中(c:/documents and setting/$user/Cookies)。浏览器会把Cookie及随后产生的请求发给相同的服务器，服务器可以再次读取 Cookie中存放的数据。
+ Cookie可以进行有效期的设置，过期的Cookie不会发送给服务器。
+Cookie的用法：
+  获取Cookies：Cookie[] all = request.getCookies();
+  获取Cookies名字：Cookie[i].getName();
+  获取Cookies的值：Cookie[i].getValue();
+  为Cookies设置新值：Cookie[i].setValue();
+  设置Cookie保存的最大期限：
+ Cookie[i].setMaxAge (int expiry);毫秒
+以cookie实现的session的流程：
+Browser访问 Web server---- Web server
+分给用户一个jsessionId并返回给用户保存在本地，同时将jsessionId保存在session中--- 用户再次访问本Web server时带着 jsessionId来访问------ Web server根据用户传过来的jsessionId跟session中的 jsessionId比较，如果有相同的，就将这个jsessionId对应的session返回给用户，这样用户可以看到上一次的访问信息。
+
+            HttpSession
+javax.servlet.http.HttpSession接口封装了HTTP会话的细节，该会话与一段时间内特定的web客户对web服务器的多个请求相关。它由Servlet容器环境实现。对Servlet的开发者隐藏实现的细节。
+在Servlet中进行会话管理时，首先要获得会话对象。HttpServletRequest.getSession()对象返回与请求相关的当前HttpSession对象，并且该对象不存在时就创建一个新的对象。
+HttpServletRequest.getSession(true)具有相同的功能。如果参数是false，当不存在会话对象的时候就不创建新的，而是返回一个Null值。
+
+       容器做的事情
+产生不重复的jsessionId；
+ 将jsessionId和session对象映射成表；
+ 将jsessionId返回给用户
+(cookie/urlRewriting);
+ 再次访问时，先在表中查jsessionId对应的session；
+ 将查到的session对象的引用放入request给用户。
+     用户做的事情
+request.getSession();
+request.setAttribute();
+request.getAttribute();
+   servlet的会话机制(servlet将
+  cookie/urlRewriting封装而成)
+底层的cookie和url之间的过程被封装；
+urlRewriting的细节被屏蔽，即jsessionId由容器生成，jsessionId列表由容器维护；
+状态对象由容器维护；
+容器提供了在状态对象中存取数据的方法；会话状态会被自动持久化。
+
+    URL Rewriting
+Cookies可以用来跟踪某一用户向站点发出的每一个请求，有人认为web站点管理员能都收集到用户所浏览网页的足够信息。这侵犯
+了用户的个人隐私权，所以某些用户会关闭浏览器的Cookie功能。这样的话就要求程序员事先在实现Cookie的同时也实现重写URL，那当Cookie失效的时候重写URL就会替代Cookie发挥作用。
+Servlet中的数据可见范围和生命周期：
+一个应用只有一个上下文对象。
+
+            Filter
+链式结构的问题.
+f.doFilter(r,r)
+过滤器是没有url的servlet
+容器知道filter的转发顺序,通过配置文件
+web.xml中的位置决定执行先后
+所以filter就解放了.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2004-9-16 星期四 晴 Servlet的基础概念
+ 1. Servlet是什么? 答：
+1) 模块化的程序，运行在服务器端，增强了请求/响应导向服务; 
+2) 应用示例： a. 访问远端对象; b. 跟踪大量信息; c. 多用户协作
+ 2. HTTP和Servlets 答：
+1) Servlet是HTTP协议中作为CGI的一个替代品; 
+2) HttpServlet类用于开发HTTP为基础的Servlet
+ 3. HttpServlet 答：
+1) 继承抽象类javax.servlet.GenericServlet，实现接口java.io.Serializable; 
+2) 用以开发Http协议为基础的Servlet
+ 4. 服务方法 答：
+1) 每当服务接收到对Servlet的请求时，服务器就会产生一个新线程，并调用Service。service方法检查HTTP请求类型(GET、POST、PUT、DELETE等),并相应地调用doGet、doPost、doPut、doDelete等。 
+2) doGet/doPost方法接收HttpServletRequest和HttpServletResponse对象。 
+3) 99%的时间里，只需注意GET和/或POST请求; 
+4) 没有任何doHead方法。
+ 5. 返回响应 答：
+1) PrintWriter out = response.getWriter // 用于返回文本数据给客户端 
+2) ServletOutputStream out = response.getOutputStream // 用于返回二进制数据给客户端
+ 6. 支持Servlet的Web服务器 答：
+1) J2EE应用服务器包括：Web Container和EJB Container; 
+2) Web Container的Servlet Engine提供对Servlet的运行支持; 
+
+2004-9-17 星期五 晴 用Servlet处理表单数据
+ 1. Form元素的属性 答：
+1) ACTION: 用来指定要处理FORM数据的Servlet的URL，也可以指定FORM数据将要发送到的电子邮件; 
+2) METHOD: 指定数据传送给HTTP服务器的方法; 
+3) ENCTYPE: 指定数据在传输之前进行编码的方式, 
+   例multipart/form-data 编码将每个字段作为MIME可兼容的文档的单独部分传输。
+ 2. 解析请求 答：
+1) 对于所有的请求： 
+   a. getParameterNames: 以Enumeration形式获取表单中清单, 每一项都可以转换成String;
+   b. getParameter: 返回表单中参数名(区分大小写)对应的值(没有这样的参数，返回null;没有任何值，返回空String); 
+   c. getParameterValues: 返回表单中参数名(区分大小写)对应的字符串数组(没有这样的参数，返回null;只有一个值，返回值为单一元素组); Servlet的生命周期
+ 1. Servlet的生命周期 答：
+1) 通过web Container装载(J2EE的组件都是被动地装载入Container)并实例化Servlet对象; 
+2) 调用init()方法(在整个生命周期中只被调用一次); 
+3) 调用service()方法(在整个生命周期中可被调用多次); 
+4) 调用destroy()方法(在整个生命周期中只被调用一次);
+ 2. init方法 答：
+1) 当首次创建Servlet时就会调用init方法, 而不是每个用户请求都会调用该方法。 
+2) 除非被destroy方法移除，否则不能被重载; 
+3) init方法一结束，servlet即可接受客户端请求;
+ 3. init方法实例 答：
+1) 在编写接受ServletConfig作为参数的init方法时，应该总是在首行调用super.init; 
+2) init方法接受ServletConfig作为参数, 用以下方法获得参数值： 
+   a. getInitParameter: 返回指定参数名称对应的值，如果参数不存在，返回null; 
+   b. getInitParameterNames: 返回指定参数名称对应的值枚举，如果参数不存在，返回的空枚举; 
+
+2004-9-20 星期一 阴
+ 3. service方法 答：
+1) 每当服务器接收到对Servlet的请求时，服务器就会产生一个新线程, 并调用service。
+   service方法检查HTTP请求类型，请相应地调用doGet、doPost、doPut、doDelete。 
+2) 被container调用去响应(ServletResponse)来自客户端的请求(ServletRequest);
+ 4. Servlets的多线程安全 答：
+1) 多线程占用资源少，处理速度快，提高了效率。 
+2) 一些编码建议： 
+   a. 对变量和方法定义适当的访问方式, 例如单纯取值操作不会有多线程安全问题; 
+   b. 同步化所有访问重要数据的实例变量; 
+   c. 创建访问类变量的访问方法。
+ 5. SingleThreadModel接口 答：
+1) 如果希望禁止多线程访问，可以让Servlet使用SingleThreadModel接口:
+   public class YourServlet extends HttpServlet implements SingleThreadModel{ ... } 
+2) 使用此接口，系统将保证不会存在多个请求线程同时访问Servlet的单个实例。
+   但是仍然需要同步对存储在Servlet外部的类变量或共享字段的访问。 
+3) 如Servlet频繁被访问，则Servlet访问的同步将严重影响性能(延时)。
+ 6. destroy方法 答：
+1) 服务器决定删除已经加载的Servlet实例之前将调用Servlet的destroy方法; 
+2) 该方法允许Servlet: 
+   a. 关闭数据库连接; 
+   b. 中止后台线程; 
+   c. 将Cookie程序清单或访问计数写到磁盘以及执行其他类似的收尾工作。
+ 7. 在Servlet终止时处理Service线程 答：
+1) 在destroy()方法中：
+   如有服务(通过一个同步化的实例方法取得当前线程数大于0)，则置关闭状态为true(通过一个同步化的实例方法实现)。
+   然后循环等待服务线程数为0. 
+2) 在Service()方法中: 如见关闭状态为true，便不执行具体逻辑方法，直接退出。 
+
+2004-9-21 星期二 晴 资源访问
+ 1. 分布式JAVA技术 答：
+1) JDBC; a. 实现了Data和Client的分开; b. 通过简单的配置可以适用不同种类的数据库。 
+2) RMI(RMI使用的协议为Internet Inter ORB Protocol); 
+3) CORBA(核心技术为ORB：相应的你的请求转为另一个物理地址另一个不同语言对象的请求。
+   纯Java的情况下根本不用CORBA);
+ 2. 转发结果至可视页面 答：
+1) 用JavaBean(用来装载一组值，遵从一定协议的class)封装结果; 
+2) 每个JVM中的每一个应用程序里都存在一个上下文; 
+3) servletContext在servletConfig的对象中; 
+4) ServletContext.getRequestDispatcher(String path)：返回一个RequestDispatcher 
+5) 通过RequestDispatcher的forward()或include()方法传送请求。
+ 3. 转发请求至新的资源 答：
+1) request dispatcher的二种传送请求方式 
+   a. Forward: 将请求从一个servlet传到服务器上的其他资源(servlet、JSP、HTML); 
+   b. Include: 包括静态或动态内容; 
+2) 获得request dispatcher的二种方式： a. ServletRequest.getRequestDispatcher() // 相对路径 b. ServletContext.getRequestDispatcher() // 绝对路径 
+3) 四种资源范围 
+   a. javax.servlet.ServletContext: 整个应用程序范围内; 
+   b. javax.servlet.http.HttpSession: 会话期间; 
+   c. javax.servlet.ServletRequest: 一个请求期间; 
+   d. javax.servlet.jsp.PageContext: 一个JSP页面; 
+
+2004-9-22 星期三 晴 Servlets中的持久状态
+ 1. HTTP协议中无状态的优缺点： 
+优点：可以服务很多客户端; 
+缺点：不能在多个请求之间共享信息(通过Cookie和Session解决);
+ 2. Cookies 答：
+1) Cookies是Web服务器发送到浏览器的简短文本信息，以后在访问同一个Web站点或域时浏览器就会毫无更改地返回该文本信息。 
+2) 用户可以决定是否接受Cookie。 
+3) 一个Cookie由以下内容组成： a. 名称; b. 单个值; c. 一些操作属性：路径或所在域、有效期以及版本号。 
+4) 每个站点，浏览器通常只接受20条Cookie,总共接受300条，以及每条Cookie限制为4KB。
+ 3. 设置Cookie 答：
+1) 创建Cookie: Cookie c = new Cookie("CookieName", "CookieValue"); 
+2) 设置有效期： c.setMaxAge(int lifetime); 黙认为负值，只作用于当前会话，不能存储在磁盘上;如为0值表示删除Cookie；有效值为秒为单位。 
+3) 在响应头中放置Cookie: response.addCookie(c); 
+4) 从客户端读取Cookie: 
+   Cookie[] cookies = request.getCookies(); 
+   Cookie cookie; 
+   for(int i=0; i" + cookie.getName() + "" + cookie.getValue()); }
+ 4. Sessions 答：
+1) 一个客户端和一个服务器端一次连接信息的所有集合，通过brower发出，由服务器端的servlet调用; 
+2) 提供一种方式在多个页面请求间确认用户或者储存关于用户的信息; 
+3) 实现会话跟踪的三种方式：a. cookie; b. URL重写; c. 隐藏的表单段
+ 5. 设置Sessions 答：
+1) 创建Sessions: HttpSession session = request.getSession(true); 
+   // true表示如不存在则创建一个新的session 
+2) 用指定名称将一个对象绑定到session: public void setAttribute(String name, Object value); 
+3) 删除与指定名称相关的所有值： public void removeAttribute(String name); 
+4) 返回会话中所有属性名 public Enumeration getAttributeNames(); 
+5) 返回指定名称对象 public Object getAttribute(String name);
+ 6. Cookies和Sessions的比较 答：
+1) Cookies可由用户决定是否需要, Sessions不能; 
+2) Cookies是一种装载sessionID的可能; 
+3) Cookies存储在客户端, Sessions存储于服务器端; 
+4) Cookies可以构造，可以由Request取出，由Response返回 
+
+2004-9-23 星期四 晴 过滤器
+ 1. 什么是过滤器? 
+与Servlet相似，过滤器是一些Web应用程序组件，可以绑定到一个Web应用程序档案中。但是与其他Web应用程序组件不同的是，过滤器是“链”在容器的处理过程中的。这就意味着它们会在servlet处理器之前访问一个进入的请求，并且在外发的响应信息返回到客户前访问这些响应信息。这种访问使得过滤器可以检查并修改请求和响应的内容。
+ 2. 过滤器可以用于：
+1) 为一个Web应用程序的新功能建立原型(可被添加到Web应用程序中或者从Web应用程序中删除而不需重写基层应用程序代码); 
+2) 向过去的代码中添加新功能。
+ 3. 过滤器放在容器结构什么位置？ 
+过滤器放在Web资源之前，可以在请求抵达它所应用的Web资源(可以是一个servlet、一个JSP页面，甚至是一个HTML页面这样的静态内容)之前截获进入的请求，并且在它返回到客户之前截获输出请求。
+ 4. 过滤器的存活周期 答：过滤器有四个阶段(与servlet类似)： 
+1) 实例化; 
+2) 初始化(调用init()方法); 
+3) 过滤(调用doFilter()方法); 
+4) 销毁(调用destroy()方法);
+ 5. 过滤器类和接口 答：所有的过滤器都必须实现javax.servlet.Filter接口: 
+1) 容器调用init()方法初始化过滤器实例： public void init(FilterConfig config) throws ServletException 
+2) doFilter()方法包含过滤器逻辑： public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException 
+3) destroy()方法由容器在销毁过滤器实例之前调用： public void destroy(); 
+4) FilterChain的doFilter()方法之后的代码构成了后期处理过滤器调用。
+ 6. 配置过滤器 
+使用和元素来配置：  
+XSLTFilter //过滤器名 
+filters.SmartXSLFilter //具体过滤器类  //初始化参数 xsltfile /xsl/stockquotes.xsl  //将过滤器应用于Web应用程序中的每个Web资源 Logger /*  
+
+2004-9-24 星期五 晴 Web应用程序生命周期事件及监听器(Servlet V2.3版本以后新增功能)
+ 1. 什么是事件监听器? 
+1) 支持ServletContext、HttpSession(since v2.3)及ServletRequest(since v2.4)中状态改变的事件通知; 
+2) 实现了一个或多个servlet事件监听器接口的类型; 
+3) 控制ServletContext、HttpSession(since v2.3)及ServletRequest(since v2.4)中的生命周期;
+ 2. Servlet Context事件监听器 
+1) 对于应用程序而言在JVM层别管理资源或保存状态 
+2) 有二种类型的事件监听器： 
+   a. ServletContextListener(以下是该监听器的方法) contextDestroyed(ServletContextEvent sce) contextInitialized(ServletContextEvent sce) 
+   b. ServletContextAttributeListener(以下是该监听器的方法) attributeAdded(ServletContextAttributeEvent scab) attributeRemoved(ServletContextAttributeEvent scab) attributeReplaced(ServletContextAttributeEvent scab)
+ 3. HTTP Session事件监听器
+1) 管理从同一个客户端或用户向一个Web应用程序发出的一系列请求相关的状态或资源; 
+2) 有二种类型的事件监听器: 
+   a. HttpSessionListener(以下是该监听器的方法) sessionCreated(HttpSessionEvent se) sessionDestroyed(HttpSessionEvent se) 
+   b. HttpSessionAttributeListener(以下是该监听器的方法) attributeAdded(HttpSessionBindingEvent se) attributeRemoved(HttpSessionBindingEvent se) attributeReplaced(HttpSessionBindingEvent se)
+ 4. Servlet Requst事件监听器 答：
+1) 管理整个request生命周期的状态 
+2) 有二种类型的事件监听器 
+   a. ServletRequestListener(以下是该监听器的方法) requestDestroyed(ServletRequestEvent sre) requestInitialized(ServletRequestEvent sre) 
+   b. ServletRequestAttributeListener(以下是该监听器的方法) attributeAdded(ServletRequestAttributeEvent srae) attributeRemoved(ServletRequestAttributeEvent srae) attributeReplaced(ServletRequestAttributeEvent srae)
+ 5. 监听器类的规定 答：
+1) 必须在部署描述符中配置实现类;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+恩师：董旭源
+dong.xuyuan@gmail.com 
